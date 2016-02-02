@@ -1,0 +1,116 @@
+body {
+  height: 100vh;
+  margin: 0;
+  font-family: sans-serif;
+  color: #eee;
+  background-color: #61767e;
+}
+
+/* FILE MENU ***************************************/
+.file-menu { /*this is the nav*/
+  background: #542437;
+
+  width: 180px;
+  height: 100%;
+
+  top: 0;
+  z-index: 1000;
+
+  position:fixed;
+}
+
+/*header */
+.file-menu #file-menu-header {
+  color:#ddd;
+  padding: 10px 10px;
+  margin: 0;   
+  font-weight: normal;
+}
+
+.file-menu div {
+  display: block; /* drops the nav vertically*/
+  color: #eee;
+  text-decoration: none;
+  padding: 10px;
+}
+
+.file-menu .file-menu-item:hover{
+  background: #c02942;
+}
+
+.file-menu-left {
+  left: -180px;
+}
+
+.file-menu-left.file-menu-open {
+  left: 0;
+}
+
+.body-unpushed {
+  overflow-x: hidden;
+  position: relative;
+  left: 0;
+}
+
+.body-pushed {
+  left: 180px;
+}
+
+/*Transition*/
+.file-menu, .body-unpushed {
+  -webkit-transition: all 0.3s ease;
+  -moz-transition: all 0.3s ease;
+  transition: all 0.3s ease;  
+}
+
+#file-menu-button {
+  cursor: pointer;
+  height: 27px;
+  width: 33px;
+  color: white;
+}
+
+.file-menu-header {
+  background: #353C53;
+  max-height: 150px;
+  padding: 10px 15px 8px;
+
+  border-bottom: 3px solid #271F3A;
+}
+
+/* NAV MENU ********************************/
+.art-menu {
+  border-right: 3px solid #271F3A;
+  border-top-right-radius: 2px;
+
+  height:92vh;
+  width:40px;
+  background-color: #353C53;
+  color:white;
+}
+
+.art-menu i {
+  display: block; /* drops the nav vertically*/
+  /*color: #fff;*/
+  text-decoration: none;
+  padding: 10px 10px 10px 15px;
+}
+
+.art-menu i:hover{
+  background-color: #c02942;
+}
+
+/* IMAGE MENU ********************************/
+.image-menu{
+  border-left: 3px solid #271F3A;
+  border-left-radius: 2px;
+
+  float:right;
+  width:180px;
+  height:92vh;
+  background: #353C53;
+}
+
+.image-menu .container{
+  padding: 10px 10px 10px;
+}
