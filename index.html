@@ -13,9 +13,12 @@
 
     <title>low poly imaging tool</title>
 
+<!--dependencies: canvas-->
+    <script src="js/canvas.js"></script>
+    <link rel="stylesheet" type="text/css" href="css/canvas.css">
 </head>
 
-<body>
+<body onload="start()">
     <div class="body-unpushed">
       <nav class="file-menu file-menu-left">
         <div id="file-menu-header">Menu</div>
@@ -50,7 +53,10 @@
             </nav><!-- End Content -->
 
             <section class="canvas-container">
-
+      <canvas id="glcanvas" width="1200" height="800">
+          Your browser doesn't appear to support the 
+              <code>&lt;canvas&gt;</code> element.
+                </canvas>
             </section>
 
         </div><!-- End Main -->
