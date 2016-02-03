@@ -7,22 +7,38 @@
     <!--general library: font awesome -->
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css">
 
+<!--general library: sigmajs-->
+
+    <script src="http://cdn.imnjb.me/libs/sigma.js/1.0.2/sigma.min.js"></script>
+    <script src="http://cdn.imnjb.me/libs/sigma.js/1.0.2/plugins/sigma.parsers.json.min.js"></script>
+    <!--<script src="./lib/sigmajs/sigma.core.js"></script>-->
+    <!--<script src="./lib/sigmajs/sigma.parsers.json.js"></script>-->
+    <!--<script src="./lib/sigmajs/forceAtlas2.js"></script>-->
+
     <!--dependencies: menus -->
-    <script src="js/menus.js"></script>
+    <script src="js/menu-animations.js"></script>
     <link rel="stylesheet" type="text/css" href="css/menus.css">
+
+<!--dependencies: file menu-->
+    <script src="js/file-menu.js"></script>
 
     <title>low poly imaging tool</title>
 
 <!--dependencies: canvas-->
     <script src="js/canvas.js"></script>
     <link rel="stylesheet" type="text/css" href="css/canvas.css">
+
+<!--dependencies: image parser-->
+    <script src="js/imageparser.js"></script>
 </head>
 
-<body onload="start()">
+<body>
     <div class="body-unpushed">
       <nav class="file-menu file-menu-left">
         <div id="file-menu-header">Menu</div>
-        <div class="file-menu-item" id="file-menu-import-image">&nbsp;Import image</div>
+        <div class="file-menu-item" id="file-menu-import-image">&nbsp;<input type="file" id="import-images"/>
+        </div>
+
         <div class="file-menu-item" id="file-menu-import-project">&nbsp;Import project</div>
         <div class="file-menu-item" id="file-menu-export-image">&nbsp;Export image</div>
         <div class="file-menu-item" id="file-menu-export-project">&nbsp;Export project</div>
@@ -33,18 +49,20 @@
 
     <div class="container">
         <div class="main">
+    <!--<div id="fileDisplayArea"></div>-->
+
             <section class="file-menu-header">
                 <i id="file-menu-button" class="fa fa-bars"></i>
             </section>
 
             <section class="image-menu">
                 <div class="container">
+
                     will eventually house image parameters (sliders, coloring, etc)
                     <br/> and also layers, if we get to that 
                 </div>
             </section>
-            
-            <nav class="art-menu">
+                       <nav class="art-menu">
                 <abbr title="select tool"><i class="fa fa-mouse-pointer"></i></abbr>
                 <abbr title="add point"><i class="fa fa-plus"></i></abbr>
                 <abbr title="remove point"><i class="fa fa-trash-o"></i></abbr>
@@ -52,11 +70,7 @@
                 <abbr title="select color"><i class="fa fa-tint"></i></abbr>
             </nav><!-- End Content -->
 
-            <section class="canvas-container">
-      <canvas id="glcanvas" width="1200" height="800">
-          Your browser doesn't appear to support the 
-              <code>&lt;canvas&gt;</code> element.
-                </canvas>
+            <section id="canvas-container">
             </section>
 
         </div><!-- End Main -->
