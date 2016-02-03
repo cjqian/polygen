@@ -17,6 +17,7 @@ window.onload = function() {
                 img.src = reader.result;
 
                 //send the image to the triangulation station
+                renderCanvas(img);
                 triangulateImage(img);
             }
 
