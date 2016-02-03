@@ -1,40 +1,50 @@
 <!doctype HTML>
 <!--c$, polygen main page-->
 <head>
-    <!--general library: jquery-->
-    <script src="https://code.jquery.com/jquery-2.2.0.min.js"></script>
+<!--general library: jquery-->
+<script src="https://code.jquery.com/jquery-2.2.0.min.js"></script>
 
-    <!--general library: font awesome -->
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css">
+<!--general library: font awesome -->
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css">
 
 <!--general library: sigmajs-->
 
-    <script src="http://cdn.imnjb.me/libs/sigma.js/1.0.2/sigma.min.js"></script>
-    <script src="http://cdn.imnjb.me/libs/sigma.js/1.0.2/plugins/sigma.parsers.json.min.js"></script>
-    <!--<script src="./lib/sigmajs/sigma.core.js"></script>-->
-    <!--<script src="./lib/sigmajs/sigma.parsers.json.js"></script>-->
-    <!--<script src="./lib/sigmajs/forceAtlas2.js"></script>-->
+<script src="http://cdn.imnjb.me/libs/sigma.js/1.0.2/sigma.min.js"></script>
+<script src="http://cdn.imnjb.me/libs/sigma.js/1.0.2/plugins/sigma.parsers.json.min.js"></script>
+<!--<script src="./lib/sigmajs/sigma.core.js"></script>-->
+<!--<script src="./lib/sigmajs/sigma.parsers.json.js"></script>-->
+<!--<script src="./lib/sigmajs/forceAtlas2.js"></script>-->
 
-    <!--dependencies: menus -->
-    <script src="js/menu-animations.js"></script>
-    <link rel="stylesheet" type="text/css" href="css/menus.css">
+<!--dependencies: menus -->
+<script src="js/menu-animations.js"></script>
+<link rel="stylesheet" type="text/css" href="css/menus.css">
 
 <!--dependencies: file menu-->
-    <script src="js/file-menu.js"></script>
+<script src="js/file-menu.js"></script>
 
-    <title>low poly imaging tool</title>
+<title>low poly imaging tool</title>
 
 <!--dependencies: canvas-->
-    <script src="js/canvas.js"></script>
-    <link rel="stylesheet" type="text/css" href="css/canvas.css">
+<script src="js/canvas.js"></script>
+<link rel="stylesheet" type="text/css" href="css/canvas.css">
 
 <!--dependencies: image parser-->
-    <script src="js/imageparser.js"></script>
+<script src="js/imageparser.js"></script>
+
+<script>
+  sigma.parsers.json('data/data.json', {
+    container: 'canvas-container',
+    settings: {
+      defaultNodeColor: '#ec5148'
+    }
+  });
+         </script>
+
 </head>
 
 <body>
-    <div class="body-unpushed">
-      <nav class="file-menu file-menu-left">
+<div class="body-unpushed">
+    <nav class="file-menu file-menu-left">
         <div id="file-menu-header">Menu</div>
         <div class="file-menu-item" id="file-menu-import-image">&nbsp;<input type="file" id="import-images"/>
         </div>
@@ -49,7 +59,7 @@
 
     <div class="container">
         <div class="main">
-    <!--<div id="fileDisplayArea"></div>-->
+            <!--<div id="fileDisplayArea"></div>-->
 
             <section class="file-menu-header">
                 <i id="file-menu-button" class="fa fa-bars"></i>
@@ -62,14 +72,13 @@
                     <br/> and also layers, if we get to that 
                 </div>
             </section>
-                       <nav class="art-menu">
+            <nav class="art-menu">
                 <abbr title="select tool"><i class="fa fa-mouse-pointer"></i></abbr>
                 <abbr title="add point"><i class="fa fa-plus"></i></abbr>
                 <abbr title="remove point"><i class="fa fa-trash-o"></i></abbr>
                 <abbr title="fill shape"><i class="fa fa-paint-brush"></i></abbr>
                 <abbr title="select color"><i class="fa fa-tint"></i></abbr>
             </nav><!-- End Content -->
-
             <section id="canvas-container">
             </section>
 
