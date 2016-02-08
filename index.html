@@ -14,6 +14,7 @@
 <script src="http://cdn.imnjb.me/libs/sigma.js/1.0.2/sigma.min.js"></script>
 <script src="http://cdn.imnjb.me/libs/sigma.js/1.0.2/plugins/sigma.parsers.json.min.js"></script>
 
+<!--drag plugin-->
 <!--<script src="./lib/sigmajs/sigma.core.js"></script>-->
 <!--<script src="./lib/sigmajs/sigma.parsers.json.js"></script>-->
 <!--<script src="./lib/sigmajs/forceAtlas2.js"></script>-->
@@ -24,6 +25,7 @@
 
 <!--dependencies: file menu-->
 <script src="js/file-menu.js"></script>
+<script src="js/art-menu.js"></script>
 
 <title>low poly imaging tool</title>
 
@@ -34,6 +36,8 @@
 <!--dependencies: image parser-->
 
 <script src="js/imageparser.js"></script>
+
+<script src="lib/sigmajs/plugins/sigma.plugins.dragNodes/sigma.plugins.dragNodes.js"></script>
 </head>
 
 <body>
@@ -71,11 +75,14 @@
 
 
             <nav class="art-menu">
-                <abbr title="select tool"><i class="fa fa-mouse-pointer"></i></abbr>
-                <abbr title="add point"><i class="fa fa-plus"></i></abbr>
-                <abbr title="remove point"><i class="fa fa-trash-o"></i></abbr>
-                <abbr title="fill shape"><i class="fa fa-paint-brush"></i></abbr>
-                <abbr title="select color"><i class="fa fa-tint"></i></abbr>
+                <script>
+                    var selectedTool = "select-tool";
+                </script>
+                <abbr title="select tool"><i class="fa fa-mouse-pointer art-tool" id="select-tool"></i></abbr>
+                <abbr title="add point"><i class="fa fa-plus art-tool" id="add-tool"></i></abbr>
+                <abbr title="remove point"><i class="fa fa-trash-o art-tool" id="remove-tool"></i></abbr>
+                <abbr title="fill shape"><i class="fa fa-paint-brush art-tool" id="fill-tool"></i></abbr>
+                <abbr title="select color"><i class="fa fa-tint art-tool" id="color-tool"></i></abbr>
             </nav><!-- End Content -->
                     </div><!-- End Main -->
     </div><!-- End Container --> 

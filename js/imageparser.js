@@ -1,3 +1,7 @@
+var s;
+var g;
+var nodeIdx;
+
 function renderCanvas(img){
     //change the canvas width and height
 
@@ -6,8 +10,8 @@ function renderCanvas(img){
     //canvas.width = img.width;
     //canvas.height = img.height;
 
-    var g = { nodes: [], edges: [] };
-    var nodeIdx = 0;
+    g = { nodes: [], edges: [] };
+    nodeIdx = 0;
     g.nodes.push({ id: 'n' + nodeIdx++,
         x: 0,
         y:  0,
@@ -33,22 +37,24 @@ function renderCanvas(img){
     document.getElementById("canvas-container").style.height = img.height + "px";
 
 
-    var s = new sigma({ 
+    s = new sigma({ 
         graph: g,
-        container: 'canvas-container',
-        settings: {
-            defaultNodeColor: '#ec5148'
-        }
+      container: 'canvas-container',
+      settings: {
+          defaultNodeColor: '#ec5148'
+      }
     });
 
     //possible: overnode, outNode, doubleClickNode, rightClickNode
     s.bind('click', function(e) {
-        console.log(e.data.x);
+        console.log("a" + e.data.x);
+        console.log("b" + sigma.utils.getX(e));
+
         s.graph.addNode({ id: 'n' + nodeIdx++,
             x: e.data.x,
             y: e.data.y,
             size: 1,
-            color: "black"});
+            color: getColorInPhoto(e.data.x, e.data.y, img)});
         console.log(s.graph.nodes());
         //console.log(e.type, e.data.node.label, e.data.captor);
         //var newNode = {id: 'n' + (i++), label: "hello", color: "pink", x: e.data.x, y: e.data.y, size: 5};
@@ -58,27 +64,47 @@ function renderCanvas(img){
 
         s.refresh();
     });
+    /*
+     *
+     *    s.bind('clickNode', function(e) {
+     *        s.graph.dropNode(e.data.node.id);
+     *        //console.log(e.type, e.data.node.label, e.data.captor);
+     *        //var newNode = {id: 'n' + (i++), label: "hello", color: "pink", x: e.data.x, y: e.data.y, size: 5};
+     *        //console.log(newNode);
+     *        //s.graph.nodes().push(newNode);
+     *        //console.log(s.graph.nodes());
+     *
+     *        s.refresh();
+     *    });
+     */
+}
 
-    s.bind('rightClick', function(e) {
-        s.graph.dropNode(getIdFromCoordinates(e.data.x, e.data.y));
-        //console.log(e.type, e.data.node.label, e.data.captor);
-        //var newNode = {id: 'n' + (i++), label: "hello", color: "pink", x: e.data.x, y: e.data.y, size: 5};
-        //console.log(newNode);
-        //s.graph.nodes().push(newNode);
-        //console.log(s.graph.nodes());
+function updateTool(selectedTool){
+    console.log(selectedTool);
+    if (selectedTool == "add-tool"){
+        s.bind('click', function(e) {
+            console.log("a" + e.data.x);
+            console.log("b" + sigma.utils.getX(e));
 
-        s.refresh();
-    });
-i
-    function getIdFromCoordinates(x, y){
-        for (var i = 0; i < s.graph.nodes().length; i++){
-            if (s.graph.nodes()[i].x == x && 
-                s.graph.nodes()[i].y == y) return s.graph.nodes()[i].id;
-        }
-    
-        return -1;
+            s.graph.addNode({ id: 'n' + nodeIdx++,
+                x: e.data.x,
+                y: e.data.y,
+                size: 1});
+                //color: getColorInPhoto(e.data.x, e.data.y, img)});
+            console.log(s.graph.nodes());
+            //console.log(e.type, e.data.node.label, e.data.captor);
+            //var newNode = {id: 'n' + (i++), label: "hello", color: "pink", x: e.data.x, y: e.data.y, size: 5};
+            //console.log(newNode);
+            //s.graph.nodes().push(newNode);
+            //console.log(s.graph.nodes());
+
+            s.refresh();
+        });
     }
-    console.log("rendering canvas");
+}
+
+function getColorInPhoto(x, y, img){
+    return '#eee';
 }
 
 function triangulateImage(img){

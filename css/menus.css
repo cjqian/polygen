@@ -83,6 +83,7 @@ body {
   border-right: 3px solid #271F3A;
   border-top-right-radius: 2px;
 top:49px;
+position:fixed;
 float:left;
   height:92vh;
   width:40px;
@@ -99,6 +100,10 @@ float:left;
 
 .art-menu i:hover{
   background-color: #c02942;
+}
+
+.art-tool.selected {
+    background-color: #c00000;    
 }
 
 /* IMAGE MENU ********************************/
