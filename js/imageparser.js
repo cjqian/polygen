@@ -44,26 +44,25 @@ function renderCanvas(img){
           defaultNodeColor: '#ec5148'
       }
     });
-
     //possible: overnode, outNode, doubleClickNode, rightClickNode
-    s.bind('click', function(e) {
-        console.log("a" + e.data.x);
-        console.log("b" + sigma.utils.getX(e));
+    //s.bind('click', function(e) {
+    //console.log("a" + e.data.x);
+    //console.log("b" + sigma.utils.getX(e));
 
-        s.graph.addNode({ id: 'n' + nodeIdx++,
-            x: e.data.x,
-            y: e.data.y,
-            size: 1,
-            color: getColorInPhoto(e.data.x, e.data.y, img)});
-        console.log(s.graph.nodes());
-        //console.log(e.type, e.data.node.label, e.data.captor);
-        //var newNode = {id: 'n' + (i++), label: "hello", color: "pink", x: e.data.x, y: e.data.y, size: 5};
-        //console.log(newNode);
-        //s.graph.nodes().push(newNode);
-        //console.log(s.graph.nodes());
+    //s.graph.addNode({ id: 'n' + nodeIdx++,
+    //x: e.data.x,
+    //y: e.data.y,
+    //size: 1,
+    //color: getColorInPhoto(e.data.x, e.data.y, img)});
+    //console.log(s.graph.nodes());
+    //console.log(e.type, e.data.node.label, e.data.captor);
+    //var newNode = {id: 'n' + (i++), label: "hello", color: "pink", x: e.data.x, y: e.data.y, size: 5};
+    //console.log(newNode);
+    //s.graph.nodes().push(newNode);
+    //console.log(s.graph.nodes());
 
-        s.refresh();
-    });
+    s.refresh();
+    //});
     /*
      *
      *    s.bind('clickNode', function(e) {
@@ -90,7 +89,7 @@ function updateTool(selectedTool){
                 x: e.data.x,
                 y: e.data.y,
                 size: 1});
-                //color: getColorInPhoto(e.data.x, e.data.y, img)});
+            //color: getColorInPhoto(e.data.x, e.data.y, img)});
             console.log(s.graph.nodes());
             //console.log(e.type, e.data.node.label, e.data.captor);
             //var newNode = {id: 'n' + (i++), label: "hello", color: "pink", x: e.data.x, y: e.data.y, size: 5};
@@ -100,6 +99,16 @@ function updateTool(selectedTool){
 
             s.refresh();
         });
+    }
+
+   if (selectedTool == "remove-tool"){
+        s.unbind('click');
+
+        s.bind('clickNode', function(e){
+            s.graph.dropNode(e.data.node.id);
+            s.refresh();
+        });
+
     }
 }
 
