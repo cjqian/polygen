@@ -82,7 +82,8 @@ body {
 .art-menu {
   border-right: 3px solid #271F3A;
   border-top-right-radius: 2px;
-
+top:49px;
+float:left;
   height:92vh;
   width:40px;
   background-color: #353C53;

@@ -1,6 +1,9 @@
 #canvas-container {
+width: 0px;
+height: 0px;
+margin-left:auto;
+margin-right:auto;
     background-color: white;
-    left: 20%;
     top: 5em;
-    position: fixed;
+    left:10em;
 }

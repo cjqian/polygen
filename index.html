@@ -2,6 +2,8 @@
 <!--c$, polygen main page-->
 <head>
 <!--general library: jquery-->
+
+<!--<script src="./lib/paperjs/paper-full.min.js"></script>-->
 <script src="https://code.jquery.com/jquery-2.2.0.min.js"></script>
 
 <!--general library: font awesome -->
@@ -11,6 +13,7 @@
 
 <script src="http://cdn.imnjb.me/libs/sigma.js/1.0.2/sigma.min.js"></script>
 <script src="http://cdn.imnjb.me/libs/sigma.js/1.0.2/plugins/sigma.parsers.json.min.js"></script>
+
 <!--<script src="./lib/sigmajs/sigma.core.js"></script>-->
 <!--<script src="./lib/sigmajs/sigma.parsers.json.js"></script>-->
 <!--<script src="./lib/sigmajs/forceAtlas2.js"></script>-->
@@ -29,17 +32,8 @@
 <link rel="stylesheet" type="text/css" href="css/canvas.css">
 
 <!--dependencies: image parser-->
+
 <script src="js/imageparser.js"></script>
-
-<script>
-  sigma.parsers.json('data/data.json', {
-    container: 'canvas-container',
-    settings: {
-      defaultNodeColor: '#ec5148'
-    }
-  });
-         </script>
-
 </head>
 
 <body>
@@ -59,19 +53,23 @@
 
     <div class="container">
         <div class="main">
-            <!--<div id="fileDisplayArea"></div>-->
+            <div id="fileDisplayArea"></div>
 
-            <section class="file-menu-header">
+            <div class="file-menu-header">
                 <i id="file-menu-button" class="fa fa-bars"></i>
-            </section>
+            </div>
 
-            <section class="image-menu">
+            <div class="image-menu">
                 <div class="container">
 
                     will eventually house image parameters (sliders, coloring, etc)
                     <br/> and also layers, if we get to that 
                 </div>
-            </section>
+            </div>
+<div id="canvas-container">
+            </div>
+
+
             <nav class="art-menu">
                 <abbr title="select tool"><i class="fa fa-mouse-pointer"></i></abbr>
                 <abbr title="add point"><i class="fa fa-plus"></i></abbr>
@@ -79,10 +77,7 @@
                 <abbr title="fill shape"><i class="fa fa-paint-brush"></i></abbr>
                 <abbr title="select color"><i class="fa fa-tint"></i></abbr>
             </nav><!-- End Content -->
-            <section id="canvas-container">
-            </section>
-
-        </div><!-- End Main -->
+                    </div><!-- End Main -->
     </div><!-- End Container --> 
 </div>
 </body>

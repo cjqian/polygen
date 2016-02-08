@@ -18,7 +18,6 @@ window.onload = function() {
 
                 //send the image to the triangulation station
                 renderCanvas(img);
-                triangulateImage(img);
             }
 
             reader.readAsDataURL(file); 
