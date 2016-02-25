@@ -1,92 +1,35 @@
 <!doctype HTML>
-<!--c$, polygen main page-->
 <head>
-<!--general library: jquery-->
-
-<!--<script src="./lib/paperjs/paper-full.min.js"></script>-->
-<script src="https://code.jquery.com/jquery-2.2.0.min.js"></script>
-
-<!--general library: font awesome -->
-<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css">
-
-<!--general library: sigmajs-->
-
-<script src="http://cdn.imnjb.me/libs/sigma.js/1.0.2/sigma.min.js"></script>
-<script src="http://cdn.imnjb.me/libs/sigma.js/1.0.2/plugins/sigma.parsers.json.min.js"></script>
-
-<!--drag plugin-->
-<!--<script src="./lib/sigmajs/sigma.core.js"></script>-->
-<!--<script src="./lib/sigmajs/sigma.parsers.json.js"></script>-->
-<!--<script src="./lib/sigmajs/forceAtlas2.js"></script>-->
-
-<!--dependencies: menus -->
-<script src="js/menu-animations.js"></script>
-<link rel="stylesheet" type="text/css" href="css/menus.css">
-
-<!--dependencies: file menu-->
-<script src="js/file-menu.js"></script>
-<script src="js/art-menu.js"></script>
-
 <title>low poly imaging tool</title>
+<script src="https://d3js.org/d3-voronoi.v0.3.min.js"></script>
 
-<!--dependencies: canvas-->
-<script src="js/canvas.js"></script>
-<link rel="stylesheet" type="text/css" href="css/canvas.css">
+<script type="text/javascript" src="lib/dat.gui.min.js"></script>
+<script type="text/javascript" src="lib/jquery.js"></script>
+<script type="text/javascript" src="lib/two.min.js"></script>
+<script type="text/javascript" src="lib/image.js"></script>
 
-<!--dependencies: image parser-->
 
-<script src="js/imageparser.js"></script>
-
-<script src="lib/sigmajs/plugins/sigma.plugins.dragNodes/sigma.plugins.dragNodes.js"></script>
+<script type="text/javascript" src="js/gui.js"></script>
+<script src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script>
+<!--<script type="text/javascript" src="js/backdrop.js"></script>-->
+<!--<script type="text/javascript" src="js/render-image.js"></script>-->
+<script type="text/javascript" src="js/triangulate.js"></script>
 </head>
 
 <body>
-<div class="body-unpushed">
-    <nav class="file-menu file-menu-left">
-        <div id="file-menu-header">Menu</div>
-        <div class="file-menu-item" id="file-menu-import-image">&nbsp;<input type="file" id="import-images"/>
-        </div>
+<p>HELLO</p>
+<canvas id="canvas"></canvas>
+    <!--<div class="assets">-->
+      <!--<svg x="0px" y="0px" width="202px" height="264px" viewBox="0 0 1000 1000"-->
+         <!--overflow="visible" enable-background="new 0 0 1000 1000" xml:space="preserve">-->
+      <!--<path fill="none" stroke="#000000" d="M200.5,204.792-->
+        <!--c0,0-35.703,58.341-99.988,58.341C36.223,263.132,0.5,210.862,0.5,131.531C0.5,52.204,38.584,0.5,100.5,0.5-->
+        <!--c61.924,0,85.354,51.704,85.354,51.704"/>-->
+      <!--</svg>-->
+    <!--</div>-->
 
-        <div class="file-menu-item" id="file-menu-import-project">&nbsp;Import project</div>
-        <div class="file-menu-item" id="file-menu-export-image">&nbsp;Export image</div>
-        <div class="file-menu-item" id="file-menu-export-project">&nbsp;Export project</div>
-        <div class="file-menu-item" id="file-menu-save">&nbsp;Save</div>
-        <div class="file-menu-item" id="file-menu-save-as">&nbsp;Save As</div>
-        <div class="file-menu-item" id="file-menu-about">&nbsp;About</div>
-    </nav>
-
-    <div class="container">
-        <div class="main">
-            <div id="fileDisplayArea"></div>
-
-            <div class="file-menu-header">
-                <i id="file-menu-button" class="fa fa-bars"></i>
-            </div>
-
-            <div class="image-menu">
-                <div class="container">
-
-                    will eventually house image parameters (sliders, coloring, etc)
-                    <br/> and also layers, if we get to that 
-                </div>
-            </div>
-<div id="canvas-container">
-            </div>
-
-
-            <nav class="art-menu">
-                <script>
-                    var selectedTool = "select-tool";
-                </script>
-                <abbr title="select tool"><i class="fa fa-mouse-pointer art-tool" id="select-tool"></i></abbr>
-                <abbr title="add point"><i class="fa fa-plus art-tool" id="add-tool"></i></abbr>
-                <abbr title="remove point"><i class="fa fa-trash-o art-tool" id="remove-tool"></i></abbr>
-                <abbr title="fill shape"><i class="fa fa-paint-brush art-tool" id="fill-tool"></i></abbr>
-                <abbr title="select color"><i class="fa fa-tint art-tool" id="color-tool"></i></abbr>
-            </nav><!-- End Content -->
-                    </div><!-- End Main -->
-    </div><!-- End Container --> 
-</div>
+<script type="text/javascript" src="js/make-svg.js"></script>
+<script type="text/javascript" src="js/main.js"></script>
 </body>
 
 
