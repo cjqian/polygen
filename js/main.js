@@ -14,17 +14,21 @@ Main.onImageLoad = function(imageElm) {
     var imageData = Main.ctx.getImageData(0, 0, imageElm.width, imageElm.height);
     Main.img = new Img(imageElm.width, imageElm.height, imageData.data);
 
-    Triangulate.addVertices(Main.img, 300);
+    Triangulate.addVertices(Main.img, 1000);
     Triangulate.addEdges(Main.img);
+    Triangulate.addTriangles(Main.img);
     MakeSvg.render();
 };
 
 // gui file selection changed; load new image
 Main.imageChangeCallback = function(newImage) {
     image = document.createElement("img");
+    image.setAttribute("id", "image");
+
     image.onload = function() {
         Main.onImageLoad(image);
     };
+
     image.src = 'img/' + newImage;           
 };
 

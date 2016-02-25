@@ -3,6 +3,7 @@ var Triangulate = Triangulate || {};
 var energyList = [];
 var nodeList = []; //nodeList is all the nodes in list form of object nodes
 var linkList = [];
+var triangleList = [];
 var nodeArray = []; //nodeArray is an array of coordinates
 
 //calculates the energy of a pixel
@@ -87,24 +88,28 @@ Triangulate.makeEnergyList = function( image ){
 Triangulate.addVertices = function ( image, threshold ){
     //Triangulate.makeEnergyList( image );
     //temp
-    for (var i = 0; i < image.width; i++){
-        for (var j = 0; j < image.height; j++){
-            if (i % 50 == 0 && j % 50 == 0){
-                var obj = {"x": j, "y": i};
+    for (var i = 100; i < image.width- 100; i++){
+        for (var j = 100; j < image.height - 100; j++){
+            if (i % 100 == 0 && j % 100 == 0){
+                //add some variance to keep it interesting
+                var x = Math.ceil((Math.random() - .5) * 80) + j;
+                var y = Math.ceil((Math.random() - .5) * 80) + i; 
+                var obj = {"x": x, "y": y};
                 energyList.push(obj);
             }
         }
     }
 
-    console.log(energyList);
+
     var maxThreshold = Math.min(threshold, energyList.length);
     for (var i = 0; i < maxThreshold - 1; i++){
         var coord = [];
-        coord.push(energyList[i].x);
         coord.push(energyList[i].y);
+        coord.push(energyList[i].x);
 
         var hexval = image.getPixel(energyList[i].x, energyList[i].y).toHex();
-        var node = {"id": "n" + i, "x": energyList[i].x, "y": energyList[i].y, "color": hexval};
+        //console.log(hexval);
+        var node = {"id": "n" + i, "x": energyList[i].y, "y": energyList[i].x, "color": hexval};
 
         nodeList.push(node);
         nodeArray.push(coord);
@@ -120,27 +125,25 @@ Triangulate.getIndexFromCoordinate = function ( x, y ){
 }
 
 Triangulate.getIndexesFromEdge = function( curEdge ) {
-        var indexes = [];
+    var indexes = [];
 
-        //get source
-        var sourceX = curEdge.source[0];
-        var sourceY = curEdge.source[1];
-        var sourceIdx = Triangulate.getIndexFromCoordinate(sourceX, sourceY);
+    //get source
+    var sourceX = curEdge.source[0];
+    var sourceY = curEdge.source[1];
+    var sourceIdx = Triangulate.getIndexFromCoordinate(sourceX, sourceY);
 
-        //get dest
-        var destX = curEdge.target[0];
-        var destY = curEdge.target[1];
-        var destIdx = Triangulate.getIndexFromCoordinate(destX, destY);
+    //get dest
+    var destX = curEdge.target[0];
+    var destY = curEdge.target[1];
+    var destIdx = Triangulate.getIndexFromCoordinate(destX, destY);
 
-        indexes.push(sourceIdx);
-        indexes.push(destIdx);
+    indexes.push(sourceIdx);
+    indexes.push(destIdx);
 
-        return indexes;
+    return indexes;
 }
 
 Triangulate.addEdges = function ( image ){
-    console.log(d3.geom.voronoi().links(nodeArray));
-
     var edgeCoords = d3.geom.voronoi().links(nodeArray);
 
     //go through each edge
@@ -153,3 +156,25 @@ Triangulate.addEdges = function ( image ){
         linkList.push(link);
     }
 }
+
+Triangulate.addTriangles = function ( image ) {
+    var triangleCoords = d3.geom.voronoi().triangles(nodeArray);
+
+    for (var i = 0; i < triangleCoords.length; i++){
+        var curTriangle = triangleCoords[i];
+        var pointA = curTriangle[0];
+        var pointB = curTriangle[1];
+        var pointC = curTriangle[2];
+
+        var startPoint = { "x": pointA[0], "y": pointA[1] };
+        var relPointA = { "x": pointB[0] - pointA[0], "y": pointB[1] - pointA[1] };
+        var relPointB = { "x": pointC[0] - pointB[0], "y": pointC[1] - pointB[1] };
+
+        var hexVal = image.getPixel(startPoint.y, startPoint.x).toHex();
+        var triangle = {"start": startPoint, "relA": relPointA, "relB": relPointB, "color": hexVal };
+        triangleList.push(triangle);
+    }
+    
+    console.log(triangleList);
+}
+    

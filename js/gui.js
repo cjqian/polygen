@@ -1,3 +1,5 @@
+console.log("HI");
+
 var FizzyText = function() {
   this.message = 'dat.gui';
   this.speed = 0.8;
@@ -5,6 +7,7 @@ var FizzyText = function() {
 };
 
 window.onload = function() {
+  console.log("HIagain");
   var text = new FizzyText();
   var gui = new dat.GUI();
   gui.add(text, 'message');
