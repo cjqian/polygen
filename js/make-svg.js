@@ -9,7 +9,7 @@ MakeSvg.appendTriangle = function(svg, triangle){
             var ax = triangle.relA.x;
             var ay = triangle.relA.y;
 
-             var bx = triangle.relB.x;
+            var bx = triangle.relB.x;
             var by = triangle.relB.y;
 
             var a = 'M ' + x + ' ' + y;
@@ -22,31 +22,38 @@ MakeSvg.appendTriangle = function(svg, triangle){
     .attr('fill', triangle.color);
 }
 
+MakeSvg.renderTriangles = function(svg) {
+
+    for (var i = 0; i < triangleList.length; i++){
+        MakeSvg.appendTriangle(svg, triangleList[i]);
+    }
+}
+
 //need to load nodeList
 MakeSvg.render = function(){
-    console.log(linkList);
     var data = { nodes: nodeList, links: linkList };
 
     var svg = d3.select("body")    
         .append("svg")
         .attr("width", image.width)
         .attr("height", image.height);
+    MakeSvg.renderTriangles(svg);
 
-    for (var i = 0; i < triangleList.length; i++){
-    MakeSvg.appendTriangle(svg, triangleList[i]);
-    }
     var drag = d3.behavior.drag()
         .on("drag", function(d,i) {
             d.x += d3.event.dx
             d.y += d3.event.dy
             d3.select(this).attr("cx", d.x).attr("cy",d.y);
-        links.each(function(l,li){ 
-            if(l.source==i){
-                d3.select(this).attr("x1",d.x).attr("y1",d.y);        
-            } else if(l.target==i){
-                d3.select(this).attr("x2",d.x).attr("y2",d.y);
-            } 
-        });
+
+            links.each(function(l,li){ 
+                if(l.source==i){
+                    d3.select(this).attr("x1",d.x).attr("y1",d.y);        
+                } else if(l.target==i){
+                    d3.select(this).attr("x2",d.x).attr("y2",d.y);
+                } 
+            });
+
+            MakeSvg.renderTriangles();
         });
 
     var links  = svg.selectAll("link")    
@@ -60,13 +67,13 @@ MakeSvg.render = function(){
             d3.select(this).attr("y1",sourceNode.y);
             return sourceNode.x
         })
-    .attr("x2",function(l){ 
-        var targetNode = data.nodes.filter(function(d,i){ return i==l.target })[0];
-        d3.select(this).attr("y2",targetNode.y);
-        return targetNode.x
-    }) 
-    .attr("fill","none")
-        .attr("stroke", "white");        
+        .attr("x2",function(l){ 
+            var targetNode = data.nodes.filter(function(d,i){ return i==l.target })[0];
+            d3.select(this).attr("y2",targetNode.y);
+            return targetNode.x
+        }) 
+        .attr("fill","none")
+            .attr("stroke", "white");        
 
     var nodes  = svg.selectAll("node")    
         .data(data.nodes)
@@ -80,8 +87,9 @@ MakeSvg.render = function(){
             return "black";
             //return d.color;
         })
+
     .call(drag);
-
-    //link parser: d3.geom.voronomi().links(vertices);
-
 }
+
+
+

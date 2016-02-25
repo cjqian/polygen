@@ -4,7 +4,6 @@ var energyList = [];
 var nodeList = []; //nodeList is all the nodes in list form of object nodes
 var linkList = [];
 var triangleList = [];
-var nodeArray = []; //nodeArray is an array of coordinates
 
 //calculates the energy of a pixel
 //at any point
@@ -84,6 +83,28 @@ Triangulate.makeEnergyList = function( image ){
     energyList.sort(compare);
 }
 
+//gets the coordinate object given a node
+Triangulate.getCoordFromNode = function(node){
+    var coord = [];
+
+    coord.push(node.x);
+    coord.push(node.y);
+
+    //TODO: fix reverse coordinate system :( (why did this happen rip)
+    return coord;
+}
+
+//get all nodeArray representations from nodeList
+Triangulate.getCoords = function(){    
+    var coordList = [];
+
+    for (var i = 0; i < nodeList.length; i++){
+        coordList.push(Triangulate.getCoordFromNode(nodeList[i]));    
+    }
+
+    return coordList;
+}
+
 //returns an array of the most significant points
 Triangulate.addVertices = function ( image, threshold ){
     //Triangulate.makeEnergyList( image );
@@ -103,16 +124,11 @@ Triangulate.addVertices = function ( image, threshold ){
 
     var maxThreshold = Math.min(threshold, energyList.length);
     for (var i = 0; i < maxThreshold - 1; i++){
-        var coord = [];
-        coord.push(energyList[i].y);
-        coord.push(energyList[i].x);
-
         var hexval = image.getPixel(energyList[i].x, energyList[i].y).toHex();
         //console.log(hexval);
         var node = {"id": "n" + i, "x": energyList[i].y, "y": energyList[i].x, "color": hexval};
 
         nodeList.push(node);
-        nodeArray.push(coord);
     }
 }
 
@@ -144,7 +160,8 @@ Triangulate.getIndexesFromEdge = function( curEdge ) {
 }
 
 Triangulate.addEdges = function ( image ){
-    var edgeCoords = d3.geom.voronoi().links(nodeArray);
+    var nodeCoords = Triangulate.getCoords();
+    var edgeCoords = d3.geom.voronoi().links(nodeCoords);
 
     //go through each edge
     for (var i = 0; i < edgeCoords.length; i++){
@@ -158,7 +175,8 @@ Triangulate.addEdges = function ( image ){
 }
 
 Triangulate.addTriangles = function ( image ) {
-    var triangleCoords = d3.geom.voronoi().triangles(nodeArray);
+    var nodeCoords = Triangulate.getCoords();
+    var triangleCoords = d3.geom.voronoi().triangles(nodeCoords);
 
     for (var i = 0; i < triangleCoords.length; i++){
         var curTriangle = triangleCoords[i];
@@ -174,7 +192,7 @@ Triangulate.addTriangles = function ( image ) {
         var triangle = {"start": startPoint, "relA": relPointA, "relB": relPointB, "color": hexVal };
         triangleList.push(triangle);
     }
-    
+
     console.log(triangleList);
 }
-    
+
