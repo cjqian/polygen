@@ -121,11 +121,10 @@ Triangulate.addVertices = function ( image, threshold ){
         }
     }
 
-
     var maxThreshold = Math.min(threshold, energyList.length);
     for (var i = 0; i < maxThreshold - 1; i++){
         var hexval = image.getPixel(energyList[i].x, energyList[i].y).toHex();
-        //console.log(hexval);
+
         var node = {"id": "n" + i, "x": energyList[i].y, "y": energyList[i].x, "color": hexval};
 
         nodeList.push(node);
@@ -169,9 +168,49 @@ Triangulate.addEdges = function ( image ){
         var indexes = Triangulate.getIndexesFromEdge( curEdge );
 
         //make an object
-        var link = {"source": indexes[0], "target": indexes[1]};
+
+        var adjNodes = "l" + indexes[0] + " l" + indexes[1];
+        var link = {"source": indexes[0], "target": indexes[1], "class": adjNodes};
         linkList.push(link);
     }
+}
+
+Triangulate.updateTriangleSvgString = function( curTriangle ){
+        //ok this is a little hairy stick with me here
+        var classStr = curTriangle.className.baseVal;
+        var tIndexes = classStr.split(" ");
+
+        //get the three nodes from the nodeList
+        var pointA = nodeList[tIndexes[0].substring(1, tIndexes[0].length)];
+        var pointB = nodeList[tIndexes[1].substring(1, tIndexes[1].length)];
+        var pointC = nodeList[tIndexes[2].substring(1, tIndexes[2].length)];
+
+        var startPoint = { "x": pointA.x, "y": pointA.y };
+        var relPointA = { "x": pointB.x - pointA.x, "y": pointB.y - pointA.y };
+        var relPointB = { "x": pointC.x - pointB.x, "y": pointC.y - pointB.y };
+        var hexVal = curTriangle.getAttribute("fill");
+        var triangle = {"start": startPoint, "relA": relPointA, "relB": relPointB, "color": hexVal, "class": classStr };
+
+        return Triangulate.getSvgStringFromTriangle(triangle);
+}
+
+Triangulate.getSvgStringFromTriangle = function(triangle){
+    var x = triangle.start.x;
+    var y = triangle.start.y;
+
+    var ax = triangle.relA.x;
+    var ay = triangle.relA.y;
+
+    var bx = triangle.relB.x;
+    var by = triangle.relB.y;
+
+    var a = 'M ' + x + ' ' + y;
+    var b = ' l ' + ax + ' ' + ay;
+    var c = ' l ' + bx + ' ' + by;
+    var z = ' z';
+    var string = a + b + c + z;
+
+    return string;
 }
 
 Triangulate.addTriangles = function ( image ) {
@@ -189,10 +228,14 @@ Triangulate.addTriangles = function ( image ) {
         var relPointB = { "x": pointC[0] - pointB[0], "y": pointC[1] - pointB[1] };
 
         var hexVal = image.getPixel(startPoint.y, startPoint.x).toHex();
-        var triangle = {"start": startPoint, "relA": relPointA, "relB": relPointB, "color": hexVal };
+
+        var aID = Triangulate.getIndexFromCoordinate(pointA[0], pointA[1]);
+        var bID = Triangulate.getIndexFromCoordinate(pointB[0], pointB[1]);
+        var cID = Triangulate.getIndexFromCoordinate(pointC[0], pointC[1]);
+
+        var classStr = "t" + aID + " t" + bID + " t" + cID;
+        var triangle = {"start": startPoint, "relA": relPointA, "relB": relPointB, "color": hexVal, "class": classStr };
         triangleList.push(triangle);
     }
-
-    console.log(triangleList);
 }
 
