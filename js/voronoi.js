@@ -14,10 +14,12 @@ var width, height, endOfLastDrag, svg;
 var myVoronoi;
 var voronoiG, triangles;
 var show;
+Voronoi.image;
 
 var dotsAttr, drag;
 
-Voronoi.initCanvas = function(){
+Voronoi.initCanvas = function(image){
+    Voronoi.image = image;
     width = image.width, height = image.height;
     endOfLastDrag = 0;
 
@@ -191,7 +193,10 @@ Voronoi.updateVoronoi = function(data) {
         .attr("points", function(d){
             centerCircles.push(findCenters(d)); return d.join(" ")
         })
-    .attr("class", "triangles")
+        .attr("class", "triangles")
+        .style("fill", function(d){
+            return Triangulate.getAverageColor(Voronoi.image, d);
+        })
         .classed("hidden", !show.triangles);
 
     myTriangles.exit().remove();

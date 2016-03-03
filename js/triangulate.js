@@ -269,3 +269,24 @@ Triangulate.addTriangles = function ( image ) {
     }
 }
 */
+
+Triangulate.getAverageColor = function(image, triangle){
+    var xMin = Math.min(triangle[0][0], triangle[1][0], triangle[2][0]);
+    var xMax = Math.max(triangle[0][0], triangle[1][0], triangle[2][0]);
+
+    var yMin = Math.min(triangle[0][1], triangle[1][1], triangle[2][1]);
+    var yMax = Math.max(triangle[0][1], triangle[1][1], triangle[2][1]);
+
+    var sumColor = 0;
+
+    for (var i = yMin; i < yMax; i++){
+        for (var j = xMin; j < xMax; j++){
+            sumColor += Triangulate.getDecimalFromPixel(image, i, j);
+        }
+    }
+
+    var colorDec = Math.ceil(sumColor / ((xMax - xMin) * (yMax - yMin)));
+    var colorHex = colorDec.toString(16);
+    return colorHex;
+}
+

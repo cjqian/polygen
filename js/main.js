@@ -2,7 +2,7 @@
 var Main = Main || {};
 
 //make initial things
-var image;
+Main.image;
 Main.canvas = document.getElementById('canvas');
 Main.context = Main.canvas.getContext('2d');
 
@@ -24,15 +24,15 @@ Main.createImage = function(imagePath){
         Main.context.drawImage(imageObj, 0, 0);
         //we get the data and make an actual image
         var imageData = Main.context.getImageData(0, 0, imageObj.width, imageObj.height);
-        image = new Img(imageObj.width, imageObj.height, imageData.data);
+        Main.image = new Img(imageObj.width, imageObj.height, imageData.data);
         Main.setupImage();
     };
 }
 
 Main.setupImage = function() {
     // now triangulate!!
-    var vertices = Triangulate.getVertices(image, 300);
-    Voronoi.initCanvas();
+    var vertices = Triangulate.getVertices(Main.image, 300);
+    Voronoi.initCanvas(Main.image);
     Voronoi.updateDots(vertices);
 }
 
