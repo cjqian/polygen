@@ -12,11 +12,10 @@ var Voronoi = Voronoi || {};
 
 var width, height, endOfLastDrag, svg;
 var myVoronoi;
-var voronoiG, triangles, circles;
+var voronoiG, triangles;
 var show;
 
-
-var circleAttr, circleAttrCenter, dotsAttr, drag;
+var dotsAttr, drag;
 
 Voronoi.initCanvas = function(){
     width = image.width, height = image.height;
@@ -50,12 +49,11 @@ Voronoi.initCanvas = function(){
     })
     .clipExtent([[0, 0], [width, height]]);
 
-    show = {voronoi: true, triangles: true, circles: true, circleCenters: false}
+    show = {voronoi: false, triangles: true}
 
     // for now, easier to debug when element types are grouped
     voronoiG = svg.append("g");
     triangles = svg.append("g");
-    circles = svg.append("g");
 
     d3.select("#show-voronoi")
         .on("change", function() {
@@ -69,28 +67,6 @@ Voronoi.initCanvas = function(){
             show.triangles = this.checked; 
             d3.selectAll(".triangles").classed("hidden", !show.triangles);
         });
-
-    d3.select("#show-circles")
-        .on("change", function() {
-            show.circles = this.checked; 
-            d3.selectAll(".circles").classed("hidden", !show.circles);
-        });
-
-    d3.select("#show-circleCenters")
-        .on("change", function() {
-            show.circleCenters = this.checked; 
-            d3.selectAll(".circleCenters").classed("hidden", !show.circleCenters);
-        });
-
-
-    // circle attributes
-    circleAttr = {cx: function(d){return d.cx},
-        cy: function(d){return d.cy},
-        r: function(d){return d.radius}}
-
-    circleAttrCenter = {cx: function(d){return d.cx},
-        cy: function(d){return d.cy},
-        r: function(d){return 3}}
 
     // dot attributes
     dotsAttr = {cx: function(d){return d[0]},
@@ -113,8 +89,6 @@ Voronoi.initCanvas = function(){
 
         endOfLastDrag = Date.now();
     }
-
-
 }
 
 Voronoi.updateDot = function(coord) {
@@ -166,7 +140,6 @@ Voronoi.updateDots = function(coords) {
 }
 
 Voronoi.updateVoronoi = function(data) {
-
     // voronoi
     currentVoronoi = voronoiG
         .selectAll(".voronoi")
@@ -222,41 +195,8 @@ Voronoi.updateVoronoi = function(data) {
         .classed("hidden", !show.triangles);
 
     myTriangles.exit().remove();
-
-    // circles
-    var myCircles = circles.selectAll(".circles")
-        .data(centerCircles)
-
-        myCircles
-        .enter()
-        .append("circle")
-        .attr(circleAttr)
-        .attr("class", "circles")
-        .classed("hidden", !show.circles);
-
-    myCircles
-        .attr(circleAttr)
-        .classed("hidden", !show.circles);
-
-    myCircles.exit().remove();
-
-    var circleCenters = circles.selectAll(".circleCenters")
-        .data(centerCircles)
-
-        circleCenters
-        .enter()
-        .append("circle")
-        .attr(circleAttrCenter)
-        .attr("class", "circleCenters")
-        .classed("hidden", !show.circleCenters);
-
-    circleCenters
-        .attr(circleAttrCenter)
-        .classed("hidden", !show.circleCenters);
-
-    circleCenters.exit().remove();
-
 }
+
 // circumcenter equation from wikipedia: http://en.wikipedia.org/wiki/Circumscribed_circle
 function findCenters(d) {
     var a = d[0], b = d[1], c = d[2];
