@@ -17,7 +17,7 @@ var show;
 Voronoi.image;
 
 var dotsAttr, drag;
-
+var addMode = false;
 Voronoi.initCanvas = function(image){
     Voronoi.image = image;
     width = image.width, height = image.height;
@@ -35,12 +35,16 @@ Voronoi.initCanvas = function(image){
             event.preventDefault();
         }, false); 
 
-    svg.on("click", function(){
-        // ignore click if it just happened
-        if(Date.now() - endOfLastDrag > 500){
-            Voronoi.updateDot(d3.mouse(this))
-        }
-    })
+    //add mode
+
+    if (addMode){ 
+        svg.on("click", function(){
+            // ignore click if it just happened
+            if(Date.now() - endOfLastDrag > 500){
+                Voronoi.updateDot(d3.mouse(this))
+            }
+        })
+    } 
 
     myVoronoi = d3.geom.voronoi()
         .x(function(d) {
@@ -76,6 +80,7 @@ Voronoi.initCanvas = function(image){
         r: 5,
         fill: "blue"}
 
+
     // set up drag for circles
     drag = d3.behavior.drag()
         .on("drag", dragmove);
@@ -92,6 +97,24 @@ Voronoi.initCanvas = function(image){
         endOfLastDrag = Date.now();
     }
 }
+
+Voronoi.removeDot = function(coord) {
+    if(coord){
+        var data = [coord];
+    } else {
+        var data = []
+    }
+
+    d3.selectAll(".dots")[0].forEach(function(d){data.push(d.__data__)})
+
+        dots = svg.selectAll(".dots").data(data);
+
+    dots.attr(dotsAttr);
+    dots.remove();
+
+    Voronoi.updateVoronoi(data);
+}
+
 
 Voronoi.updateDot = function(coord) {
     if(coord){
@@ -147,7 +170,6 @@ Voronoi.updateVoronoi = function(data) {
         .selectAll(".voronoi")
         .data(myVoronoi(data));
 
-
     currentVoronoi
         .classed("hidden", !show.voronoi)
         .attr("d", function(d) {
@@ -193,13 +215,27 @@ Voronoi.updateVoronoi = function(data) {
         .attr("points", function(d){
             centerCircles.push(findCenters(d)); return d.join(" ")
         })
-        .attr("class", "triangles")
+    .attr("class", "triangles")
         .style("fill", function(d){
             return Triangulate.getAverageColor(Voronoi.image, d);
         })
-        .classed("hidden", !show.triangles);
+    .classed("hidden", !show.triangles);
 
     myTriangles.exit().remove();
+
+    //update the handlers
+        d3.selectAll(".dots").on("dblclick", function(){
+            var x = this.cx.animVal.value;
+            var y = this.cy.animVal.value;
+
+            var curNode = [];
+            curNode.push(x);
+            curNode.push(y);
+
+            Voronoi.removeDot(curNode);
+        });
+
+
 }
 
 // circumcenter equation from wikipedia: http://en.wikipedia.org/wiki/Circumscribed_circle
