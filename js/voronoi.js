@@ -99,18 +99,15 @@ Voronoi.initCanvas = function(image){
 }
 
 Voronoi.removeDot = function(coord) {
-    if(coord){
-        var data = [coord];
-    } else {
-        var data = []
-    }
+    var data = [];
 
-    d3.selectAll(".dots")[0].forEach(function(d){data.push(d.__data__)})
+     d3.selectAll(".dots")[0].forEach(function(d){
+        if (d.cx.animVal.value != coord[0] && d.cy.animVal.value != coord[1])
+        data.push(d.__data__)});
 
         dots = svg.selectAll(".dots").data(data);
 
     dots.attr(dotsAttr);
-    dots.remove();
 
     Voronoi.updateVoronoi(data);
 }
@@ -224,16 +221,16 @@ Voronoi.updateVoronoi = function(data) {
     myTriangles.exit().remove();
 
     //update the handlers
-        d3.selectAll(".dots").on("dblclick", function(){
-            var x = this.cx.animVal.value;
-            var y = this.cy.animVal.value;
+    d3.selectAll(".dots").on("dblclick", function(){
+        var x = this.cx.animVal.value;
+        var y = this.cy.animVal.value;
 
-            var curNode = [];
-            curNode.push(x);
-            curNode.push(y);
+        var curNode = [];
+        curNode.push(x);
+        curNode.push(y);
 
-            Voronoi.removeDot(curNode);
-        });
+        Voronoi.removeDot(curNode);
+    });
 
 
 }
