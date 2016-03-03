@@ -1,0 +1,70 @@
+body {
+    font-family: 'Raleway', sans-serif;
+}
+
+label {
+    font-size: 16px;
+}
+
+
+@media(max-width:768px) {
+    label {
+        font-size: 12px;
+    }
+}
+
+@media(max-width:558px) {
+    label {
+        font-size: 8px;
+    }
+}
+
+.triangles {
+    stroke: blue;
+    fill: none;
+}
+
+.circles {
+    stroke: grey;
+    fill: none;
+}
+
+.circleCenters {
+    stroke: black;
+    stroke-width: 2px;
+    fill: white;
+}
+
+.voronoi {
+    stroke: red;
+    fill: none;
+}
+
+#form {
+  position: absolute;
+  top: 45px;
+  left: 82%;
+}
+
+#form2 {
+  position: absolute;
+  top: 85px;
+  left: 82%;
+}
+
+#form3 {
+  position: absolute;
+  top: 125px;
+  left: 82%;
+}
+
+#form4 {
+  position: absolute;
+  top: 165px;
+  left: 82%;
+}
+
+.hidden {
+    display: none;
+}
+

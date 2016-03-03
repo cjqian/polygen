@@ -1,57 +1,38 @@
 // this construction helps avoid polluting the global name space
 var Main = Main || {};
 
+//make initial things
 var image;
+Main.canvas = document.getElementById('canvas');
+Main.context = Main.canvas.getContext('2d');
 
-// called when image is finished loading
-Main.onImageLoad = function(imageElm) {
-    Main.ctx.clearRect(0, 0, Main.canvas.width, Main.canvas.height);
-    Main.canvas.width = imageElm.width;
-    Main.canvas.height = imageElm.height;
-    
-    Main.ctx.drawImage(imageElm, 0, 0);
+Main.createImage = function(imagePath){
+    //now, we call the equivalent of ("image change callback")
+    var imageObj = document.createElement('img');
+    imageObj.setAttribute("id", "image");
+    imageObj.src = './img/' + imagePath;
 
-    var imageData = Main.ctx.getImageData(0, 0, imageElm.width, imageElm.height);
-    Main.img = new Img(imageElm.width, imageElm.height, imageData.data);
+    //TODO reload bug??
+    imageObj.onload = function(){
+        //on load, we reset the image object
+        Main.context.clearRect(0, 0, Main.canvas.width, Main.canvas.height);
+        console.log(imageObj.width);
+        Main.canvas.width = imageObj.width;
+        console.log(Main.canvas.width);
+        Main.canvas.height = imageObj.height;
 
-    Triangulate.addVertices(Main.img, 1000);
-    Triangulate.addEdges(Main.img);
-    Triangulate.addTriangles(Main.img);
-    MakeSvg.render();
-};
-
-// gui file selection changed; load new image
-Main.imageChangeCallback = function(newImage) {
-    image = document.createElement("img");
-    image.setAttribute("id", "image");
-
-    image.onload = function() {
-        Main.onImageLoad(image);
+        Main.context.drawImage(imageObj, 0, 0);
+        //we get the data and make an actual image
+        var imageData = Main.context.getImageData(0, 0, imageObj.width, imageObj.height);
+        image = new Img(imageObj.width, imageObj.height, imageData.data);
+        Main.setupImage();
     };
+}
 
-    image.src = 'img/' + newImage;           
-};
-
-// called when the gui params change and we need to update the image
-Main.controlsChangeCallback = function() {
-    var outputImg = Main.img.copyImg();
-    
-    outputImg = Filters.update(outputImg, Gui.values);
-    
-    Main.ctx.clearRect(0, 0, Main.canvas.width, Main.canvas.height);
-    Main.canvas.width  = outputImg.width;
-    Main.canvas.height = outputImg.height;
-    
-    Main.ctx.putImageData( outputImg.toImgData(), 0, 0);
-};
-
-// when HTML is finished loading, do this
-window.onload = function() {
-    Main.canvas = document.getElementById('canvas');
-    Main.ctx    = canvas.getContext('2d');
-    
-    // load the first image in the file selector
-    Main.imageChangeCallback('city.jpg');
-
+Main.setupImage = function() {
     // now triangulate!!
-};
+    var vertices = Triangulate.getVertices(image, 300);
+    Voronoi.initCanvas();
+    Voronoi.updateDots(vertices);
+}
+

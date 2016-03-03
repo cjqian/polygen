@@ -1,23 +1,17 @@
-<!doctype HTML>
+<!doctype html>
+<html lang="en">
 <head>
-<title>low poly imaging tool</title>
-<script src="https://d3js.org/d3-voronoi.v0.3.min.js"></script>
-
+<meta charset="utf-8">
+<link href='http://fonts.googleapis.com/css?family=Raleway' rel='stylesheet' type='text/css'>
 <script type="text/javascript" src="lib/dat.gui.min.js"></script>
-<script type="text/javascript" src="lib/jquery.js"></script>
-<script type="text/javascript" src="lib/two.min.js"></script>
 <script type="text/javascript" src="lib/image.js"></script>
 
+<link rel="stylesheet" href="css/voronoi.css">
 
 <script src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script>
-
-<script type="text/javascript" src="js/triangulate.js"></script>
 </head>
 
 <body>
-<canvas id="canvas"></canvas>
-
-<p id="instructions">Explore <a href="http://en.wikipedia.org/wiki/Voronoi_diagram">Voronoi diagrams</a> and <a href="http://en.wikipedia.org/wiki/Delaunay_triangulation">Delaunay triangulation</a>. <strong>Click to add dots.</strong> Drag dots to move them.</p>
 <label id="form" for="show-voronoi" class="form">
     <input type="checkbox" id="show-voronoi" checked>
     Show Voronoi Polygons
@@ -36,13 +30,15 @@
 </label>        
 <section id="box" class="main">
 </section>
+
+<canvas id="canvas"></canvas>
 <!-- call JS files -->
-<script src="voronoi.js"></script>
-<script type="text/javascript" src="js/gui.js"></script>
-<script type="text/javascript" src="js/make-svg.js"></script>
-<script type="text/javascript" src="js/main.js"></script>
+<script src="js/triangulate.js"></script>
+<script src="js/main.js"></script>
 
-
+<script>
+    Main.createImage('city.jpg');
+</script>
+<script src="js/voronoi.js"></script>
 </body>
-
-
+</html>
