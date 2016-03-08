@@ -5,33 +5,21 @@
 <link href='http://fonts.googleapis.com/css?family=Raleway' rel='stylesheet' type='text/css'>
 <script type="text/javascript" src="lib/dat.gui.min.js"></script>
 <script type="text/javascript" src="lib/image.js"></script>
-
+<script type="text/javascript" src="lib/jquery.js"></script>
 <link rel="stylesheet" href="css/voronoi.css">
 
 <script src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script>
 </head>
 
 <body>
-<label id="form" for="show-voronoi" class="form">
-    <input type="checkbox" id="show-voronoi">
-    Show Voronoi Polygons
-</label>
-<label id="form2" for="show-triangles" class="form">
-    <input type="checkbox" id="show-triangles" checked>
-    Show Delaunay Triangles
-</label>
-<label id="form3" for="add-mode-on" class="form">
-    <input type="checkbox" id="add-mode-on" checked>
-    Add Mode On
-</label>
-
-<section id="box" class="main">
-</section>
-
 <canvas id="canvas"></canvas>
 <!-- call JS files -->
 <script src="js/triangulate.js"></script>
+
+<script type="text/javascript" src="js/gui.js"></script>
 <script src="js/main.js"></script>
+
+<input id="file" type="file" style="visibility:hidden"/>
 
 <script>
 //Main.createImage('selfie.jpg');

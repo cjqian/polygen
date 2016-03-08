@@ -30,12 +30,21 @@ Main.createImage = function(imagePath){
 }
 
 Main.setupImage = function() {
-    // now triangulate!!
+    Voronoi.clearCanvas();
+
     //amount of randomness
     Triangulate.initImage(Main.image);
-    //number of vertices
-    var vertices = Triangulate.getVertices(600);
     Voronoi.initCanvas(Main.image);
-    Voronoi.updateDots(vertices);
+
+    //if (typeof(ie.nVertices) != "undefined" && typeof(ie.nRand) !=  "undefined")
+    if (typeof ie != 'undefined')
+        Main.updateImage(ie.nVertices, ie.nRand);
+    else
+        Main.updateImage(600, .01);
 }
 
+Main.updateImage = function(nVertices, nRand){
+    console.log("Updating image with " + nVertices + " and rand " + nRand);
+    var vertices = Triangulate.getVertices(nVertices, nRand);
+    Voronoi.updateDots(vertices);
+}

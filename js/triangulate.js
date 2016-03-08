@@ -81,7 +81,6 @@ Triangulate.getPointsInBlock = function(n, i, j){
         points.push(curPoint);
     }
 
-    console.log(points);
     return points;
 }
 
@@ -195,11 +194,11 @@ Triangulate.getBlockStdDevs = function(){
 }
 
 //returns an array of the most significant points
-Triangulate.getVertices = function ( n ){
+Triangulate.getVertices = function ( n , rand){
     Triangulate.resetThreshold( n );
 
     //start with a uniform mesh with 10% of our points
-    var nodeArray = Triangulate.getUniformPoints(.01);
+    var nodeArray = Triangulate.getUniformPoints(rand);
 
     //get the average standard deviations of each block
     var stdDevResult = Triangulate.getBlockStdDevs();

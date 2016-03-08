@@ -18,6 +18,10 @@ Voronoi.image;
 
 var dotsAttr, drag;
 var addMode = true;
+Voronoi.clearCanvas = function(){
+    d3.select('svg').remove();
+}
+
 Voronoi.initCanvas = function(image){
     Voronoi.image = image;
     width = image.width, height = image.height;
@@ -28,7 +32,17 @@ Voronoi.initCanvas = function(image){
         .attr('width', width)
         .attr('height', height)
 
-        svg.append('rect').attr({width: width, height: height, fill: "none", stroke: 'red'})
+        svg.append("defs")
+        .append("pattern")
+        .attr("width", width)
+        .attr("height", height)
+        .attr("id", "bg")
+        .append("image")
+        .attr("xlink:href", "img/city.jpg")
+        .attr("width", width)
+        .attr("height", height);
+
+    svg.append('rect').attr({width: width, height: height, fill: "url(#bg)"})
 
         // so that touchmove is not scrolling
         document.body.addEventListener('touchmove', function(event) {
@@ -57,23 +71,32 @@ Voronoi.initCanvas = function(image){
     voronoiG = svg.append("g");
     triangles = svg.append("g");
 
-    d3.select("#show-voronoi")
-        .on("change", function() {
-            show.voronoi = this.checked; 
-            d3.selectAll(".voronoi").classed("hidden", !show.voronoi);
-        });
+    // dot attributes
+    dotsAttr = {cx: function(d){return d[0]},
+        cy:function(d){return d[1]},
+        r: 5,
+        fill: "blue"}
 
 
-    d3.select("#show-triangles")
-        .on("change", function() {
-            show.triangles = this.checked; 
-            d3.selectAll(".triangles").classed("hidden", !show.triangles);
-        });
+    // set up drag for circles
+    drag = d3.behavior.drag()
+        .on("drag", dragmove);
 
+    function dragmove(d) {
+        d3.select(this)
+            .attr("cx", d3.event.x)
+            .attr("cy", d3.event.y);
 
-    d3.select("#add-mode-on")
-        .on("change", function() {
-            addMode = !addMode;
+        this.__data__ = [d3.event.x, d3.event.y]
+
+            Voronoi.updateDot();
+
+        endOfLastDrag = Date.now();
+    }
+}
+
+Voronoi.toggleAddMode = function(toggle){
+            addMode = toggle;
 
             if (addMode){
                 svg.on("click", function(){
@@ -100,30 +123,21 @@ Voronoi.initCanvas = function(image){
                 });
 
             }
-        });
 
-    // dot attributes
-    dotsAttr = {cx: function(d){return d[0]},
-        cy:function(d){return d[1]},
-        r: 5,
-        fill: "blue"}
+}
+Voronoi.toggleShowPolygons = function(toggle){
+    show.voronoi = toggle; 
+    d3.selectAll(".voronoi").classed("hidden", !show.voronoi);
+}
+Voronoi.toggleShowTriangles = function(toggle){
 
+    show.triangles = toggle; 
+    d3.selectAll(".triangles").classed("hidden", !show.triangles);
+}
 
-    // set up drag for circles
-    drag = d3.behavior.drag()
-        .on("drag", dragmove);
-
-    function dragmove(d) {
-        d3.select(this)
-            .attr("cx", d3.event.x)
-            .attr("cy", d3.event.y);
-
-        this.__data__ = [d3.event.x, d3.event.y]
-
-            Voronoi.updateDot();
-
-        endOfLastDrag = Date.now();
-    }
+Voronoi.clearDots = function(){
+    d3.selectAll(".dots").remove();
+    Voronoi.updateVoronoi([]);
 }
 
 Voronoi.removeDot = function(coord) {
@@ -213,6 +227,7 @@ Voronoi.updateVoronoi = function(data) {
             if(typeof(d) != 'undefined'){
                 return "M" + d.join("L") + "Z"}
         })
+
     .datum(function(d) {
         if(typeof(d) != 'undefined'){
             return d.point;
