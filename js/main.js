@@ -31,7 +31,10 @@ Main.createImage = function(imagePath){
 
 Main.setupImage = function() {
     // now triangulate!!
-    var vertices = Triangulate.getVertices(Main.image, 600);
+    //amount of randomness
+    Triangulate.initImage(Main.image);
+    //number of vertices
+    var vertices = Triangulate.getVertices(600);
     Voronoi.initCanvas(Main.image);
     Voronoi.updateDots(vertices);
 }

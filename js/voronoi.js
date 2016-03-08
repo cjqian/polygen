@@ -35,12 +35,12 @@ Voronoi.initCanvas = function(image){
             event.preventDefault();
         }, false); 
 
-        svg.on("click", function(){
-            // ignore click if it just happened
-            if(Date.now() - endOfLastDrag > 500){
-                Voronoi.updateDot(d3.mouse(this))
-            }
-            }); 
+    svg.on("click", function(){
+        // ignore click if it just happened
+        if(Date.now() - endOfLastDrag > 500){
+            Voronoi.updateDot(d3.mouse(this))
+        }
+    }); 
 
     myVoronoi = d3.geom.voronoi()
         .x(function(d) {
@@ -76,28 +76,28 @@ Voronoi.initCanvas = function(image){
             addMode = !addMode;
 
             if (addMode){
-        svg.on("click", function(){
-            // ignore click if it just happened
-            if(Date.now() - endOfLastDrag > 500){
-                Voronoi.updateDot(d3.mouse(this))
-            }
-        })
+                svg.on("click", function(){
+                    // ignore click if it just happened
+                    if(Date.now() - endOfLastDrag > 500){
+                        Voronoi.updateDot(d3.mouse(this))
+                    }
+                })
 
             } else {
-svg.on("click", function(){
+                svg.on("click", function(){
 
-});
-//update the handlers
-    d3.selectAll(".dots").on("dblclick", function(){
-        var x = this.cx.animVal.value;
-        var y = this.cy.animVal.value;
+                });
+                //update the handlers
+                d3.selectAll(".dots").on("dblclick", function(){
+                    var x = this.cx.animVal.value;
+                    var y = this.cy.animVal.value;
 
-        var curNode = [];
-        curNode.push(x);
-        curNode.push(y);
+                    var curNode = [];
+                    curNode.push(x);
+                    curNode.push(y);
 
-        Voronoi.removeDot(curNode);
-    });
+                    Voronoi.removeDot(curNode);
+                });
 
             }
         });
@@ -129,11 +129,11 @@ svg.on("click", function(){
 Voronoi.removeDot = function(coord) {
     var data = [];
 
-     d3.selectAll(".dots")[0].forEach(function(d){
+    d3.selectAll(".dots")[0].forEach(function(d){
         if (d.cx.animVal.value != coord[0] && d.cy.animVal.value != coord[1])
         data.push(d.__data__)});
 
-        dots = svg.selectAll(".dots").data(data);
+    dots = svg.selectAll(".dots").data(data);
 
     dots.attr(dotsAttr);
 
@@ -201,11 +201,11 @@ Voronoi.updateVoronoi = function(data) {
             if(typeof(d) != 'undefined'){
                 return "M" + d.join("L") + "Z"}
         })
-        .style("fill", "pink")
-    .datum(function(d) {
-        if(typeof(d) != 'undefined'){
-            return d.point;
-        }});
+    .style("fill", "pink")
+        .datum(function(d) {
+            if(typeof(d) != 'undefined'){
+                return d.point;
+            }});
 
     currentVoronoi.enter()
         .append("path")
@@ -241,15 +241,15 @@ Voronoi.updateVoronoi = function(data) {
         .attr("points", function(d){
             centerCircles.push(findCenters(d)); return d.join(" ")
         })
-        .attr("class", "triangles")
-            .style("fill", function(d){
-                return Triangulate.getAverageColor(Voronoi.image, d);
-            })
-        .classed("hidden", !show.triangles);
+    .attr("class", "triangles")
+        .style("fill", function(d){
+            return Triangulate.getAverageColor(Voronoi.image, d);
+        })
+    .classed("hidden", !show.triangles);
 
     myTriangles.exit().remove();
 
-    
+
 
 }
 

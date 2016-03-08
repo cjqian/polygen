@@ -1,42 +1,44 @@
 var Triangulate = Triangulate || {};
 
-var energyList = [];
-var nodeList = []; //nodeList is all the nodes in list form of object nodes
-var linkList = [];
-var triangleList = [];
+Triangulate.image;
 
-//gets the coordinate object given a node
-Triangulate.getCoordFromNode = function(node){
-    var coord = [];
+Triangulate.blockWidth; 
+Triangulate.blockHeight;
 
-    coord.push(node.x);
-    coord.push(node.y);
+Triangulate.blocksPerRow;
+Triangulate.blocksPerCol;
 
-    //TODO: fix reverse coordinate system :( (why did this happen rip)
-    return coord;
+Triangulate.blockStdDevs; //list of standard deviations for each list
+/*
+[
+    block 0: [
+        [x, y], [x, y].....
+    ]
+]
+*/
+
+Triangulate.initImage = function(img){
+    Triangulate.image = img;
+
+    Triangulate.image.width = img.width;
+    Triangulate.image.height = img.height;
 }
 
-//get all nodeArray representations from nodeList
-Triangulate.getCoords = function(){    
-    var coordList = [];
 
-    for (var i = 0; i < nodeList.length; i++){
-        coordList.push(Triangulate.getCoordFromNode(nodeList[i]));    
-    }
-
-    return coordList;
-}
-
-//returns a uniform distribution of points points
-Triangulate.getUniformPoints = function (image, blockHeight, blockWidth, points){
+//returns n uniform points with some skew
+Triangulate.getUniformPoints = function ( skew ){
     var nodeArray = [];
 
-    for (var i = blockHeight/2; i < image.height; i+= blockHeight){
-        for (var j = blockWidth/2; j < image.width; j+= blockWidth){
+    for (var i = Triangulate.blockHeight/2; i < Triangulate.image.height; i+= Triangulate.blockHeight){
+        for (var j = Triangulate.blockWidth/2; j < Triangulate.image.width; j+= Triangulate.blockWidth){
             var curNode = [];
 
-            curNode.push(j);
-            curNode.push(i);
+            //randomness up to 1% of the image width/height
+            var randomX = Math.ceil((Math.random() - .5) * Triangulate.image.width * skew);
+            var randomY = Math.ceil((Math.random() - .5) * Triangulate.image.height * skew);
+
+            curNode.push(j + randomX);
+            curNode.push(i + randomY);
 
             nodeArray.push(curNode);
         }
@@ -45,230 +47,182 @@ Triangulate.getUniformPoints = function (image, blockHeight, blockWidth, points)
     return nodeArray;
 }
 
-//returns "significance" of point in relation to neighbors
-Triangulate.getEnergy = function(image, i, j){
-    return (Math.random() * 20);
+Triangulate.getIdxFromCoordStart = function(i, j ){
+    var iRaw = i / Triangulate.blockHeight;
+    var jRaw = j / Triangulate.blockWidth;
+
+    return (iRaw * Triangulate.blocksPerRow + jRaw);
 }
 
-Triangulate.getPointsInBlock = function(image, n, yBlockStart, xBlockStart, blockHeight, blockWidth){
-    energyList = [];
+//returns n points in the block starting at i, j
+Triangulate.getPointsInBlock = function(n, i, j){
+    //first, we get the points in the block
+    var curBlockIdx = Triangulate.getIdxFromCoordStart(i, j);
+    var curBlockStdDevs = Triangulate.blockStdDevs[curBlockIdx];
 
-    for (var i = yBlockStart; i < yBlockStart + blockHeight; i++){
-        for (var j = xBlockStart; j < xBlockStart + blockWidth; j++){                   
-            var energy = Triangulate.getEnergy(image, i, j); 
-            energyList.push({energy: energy, x: j, y: i});
-        }
-    }
+    //var blockStdDevs = Triangulate.blockStdDevs.slice(0, 10);
 
+    //now, we sort it
     function compare(a, b){
-        if (a.energy < b.energy) return -1;
-        else if (a.energy > b.energy) return 1;
+        if (a.val < b.val) return -1;
+        else if (a.val > b.val) return 1;
         else return 0;
     }
-
-    energyList.sort(compare);
+    curBlockStdDevs.sort(compare);
 
     //now, we make the actual array 
-    blockArray = [];
+    points = [];
     for (var i = 0; i < n; i++){
-        curNode = [];
-        curNode.push(energyList[i].x);
-        curNode.push(energyList[i].y);
+        curPoint = [];
 
-        blockArray.push(curNode);
+        curPoint.push(curBlockStdDevs[i].x);
+        curPoint.push(curBlockStdDevs[i].y);
+
+        points.push(curPoint);
     }
 
-    return blockArray;
+    console.log(points);
+    return points;
 }
 
 
-Triangulate.getDecimalFromPixel = function(image, i, j){
-    var curPixelColor = image.getPixel(i, j).toHex();
+Triangulate.getDecimalFromPixel = function(i, j){
+    var curPixelColor = Triangulate.image.getPixel(i, j).toHex();
     var curPixelHex = curPixelColor.toString().substring(1, curPixelColor.length);
     var curPixelDec = parseInt(curPixelHex, 16);
-
     return curPixelDec;
 }
 
+Triangulate.getDecimalArrayFromPixel = function(image, i, j){
+    var curPixelColor = image.getPixel(i, j).toHex();
+    var curPixelHex = curPixelColor.toString().substring(1, curPixelColor.length);
 
-//returns the standard deviation of hex values of a "block"
-Triangulate.getStdDev = function(image, yBlockStart, xBlockStart, blockHeight, blockWidth){
-    var sumPixelVal = 0;
+    var hexVals = [];
 
-    //iterate through each pixel of the block and get the average
-    for (var i = yBlockStart; i < yBlockStart + blockHeight; i++){
-        for (var j = xBlockStart; j < xBlockStart + blockWidth; j++){
-            curPixelDec = Triangulate.getDecimalFromPixel(image, i, j);
-            sumPixelVal += curPixelDec;
+    hexVals.push(parseInt(curPixelHex.substring(0, 2), 16));
+    hexVals.push(parseInt(curPixelHex.substring(2, 4), 16));
+    hexVals.push(parseInt(curPixelHex.substring(4, 6), 16));
+
+    return hexVals;
+}
+
+
+Triangulate.resetThreshold = function( n ){
+    var points = n/10; // 1/10 of total points atm, should be variable
+    var pointsSqrt = Math.ceil(Math.sqrt(points));
+
+    Triangulate.blockWidth = Math.ceil(Triangulate.image.width / pointsSqrt);
+    Triangulate.blockHeight = Math.ceil(Triangulate.image.height / pointsSqrt);
+
+    Triangulate.blocksPerRow = Math.floor(Triangulate.image.width / Triangulate.blockWidth);
+    Triangulate.blocksPerCol = Math.floor(Triangulate.image.height / Triangulate.blockHeight);
+
+    Triangulate.blockStdDevs = new Array(Triangulate.blocksPerRow * Triangulate.blocksPerCol);
+}
+
+
+Triangulate.toIdx = function(i, j){
+    return (i * Triangulate.blocksPerRow + j);
+}
+
+Triangulate.getX = function(idx){
+    return (idx - Triangulate.getY(idx));
+    //return (idx - Math.flooTriangulate.blocksPerRow);
+}
+
+Triangulate.getY = function(idx){
+    return Math.floor(idx / Triangulate.blocksPerRow);
+}
+
+//get the average std dev of the block starting at i, j
+//this assumes that the pixelStdDev array is filled out
+Triangulate.getAvgPixVal = function(y, x){
+    var sumPixVal = 0;
+
+    for (var i = y; i < y + Triangulate.blockHeight; i++){
+        for (var j = x; j < x + Triangulate.blockWidth; j++){
+            sumPixVal += Triangulate.getDecimalFromPixel(i, j);
         }
     }
-    var avgPixelVal = sumPixelVal / (blockHeight * blockWidth);
 
-    //now we get the stddev of the block
-    var sumDiffSq = 0;
-    for (var i = yBlockStart; i < yBlockStart + blockHeight; i++){
-        for (var j = xBlockStart; j < xBlockStart + blockWidth; j++){
-            var curDiff = Triangulate.getDecimalFromPixel(image, i, j) - avgPixelVal;
+    return (sumPixVal / (Triangulate.blockHeight * Triangulate.blockWidth));
+}
+
+//sets the standard deviation of all pixels in the block starting at i, j and returns the average
+Triangulate.getAvgStdDev = function(y, x){
+    var avgPixVal = Triangulate.getAvgPixVal(y, x);
+
+    var sumStdDev = 0;
+
+    var curBlockStdDevs = [];
+
+    for (var i = y; i < y + Triangulate.blockHeight; i++){
+        for (var j = x; j < x + Triangulate.blockWidth; j++){
+            var curDiff = Triangulate.getDecimalFromPixel(i, j) - avgPixVal;
             var curDiffSq = curDiff * curDiff;
 
-            sumDiffSq += curDiffSq;
+            var curSDObj = {"x": j, "y": i, "val": curDiffSq};
+            curBlockStdDevs.push(curSDObj);
+
+            sumStdDev += curDiffSq;
         }
     }
 
-    var stdDevSq = sumDiffSq / (blockHeight * blockWidth);
-    var stdDev = Math.sqrt(stdDevSq);
+    Triangulate.blockStdDevs[Triangulate.getIdxFromCoordStart(y, x)] = curBlockStdDevs;
 
-    return stdDev;
+    return (sumStdDev / (Triangulate.blockHeight * Triangulate.blockWidth));
+}
+
+//returns an array of standard deviations for each block
+Triangulate.getBlockStdDevs = function(){
+    var stdDevs = [];
+
+    var sumStdDevs = 0;
+    //for each block
+    for (var i = 0; i < Triangulate.image.height; i += Triangulate.blockHeight){
+        for (var j = 0; j < Triangulate.image.width; j += Triangulate.blockWidth){
+            var avgStdDev = Triangulate.getAvgStdDev(i, j); //blockStdDevs should be filled now
+            stdDevs.push(avgStdDev);
+            sumStdDevs += avgStdDev;
+        }
+    }
+
+    //result list; first the array of std devs, then their sum
+    var resList = [];
+    resList.push(stdDevs);
+    resList.push(sumStdDevs);
+    return resList;
 }
 
 //returns an array of the most significant points
-Triangulate.getVertices = function ( image, threshold ){
-    var points = threshold/10;
-    var pointsSqrt = Math.ceil(Math.sqrt(points));
-
-    var blockWidth = Math.ceil(image.width / pointsSqrt);
-    var blockHeight = Math.ceil(image.height / pointsSqrt);
+Triangulate.getVertices = function ( n ){
+    Triangulate.resetThreshold( n );
 
     //start with a uniform mesh with 10% of our points
-    var nodeArray = Triangulate.getUniformPoints(image, blockHeight, blockWidth, threshold/10);
+    var nodeArray = Triangulate.getUniformPoints(.01);
 
-    //get the standard deviations of each block
-    var sumStdDev = 0;
-    var stdDevs = [];
-    for (var i = 0; i < image.height; i += blockHeight){
-        for (var j = 0; j < image.width; j += blockWidth){
-            var curStdDev = Triangulate.getStdDev(image, i, j, blockHeight, blockWidth);
-            stdDevs.push(curStdDev);
-            sumStdDev += curStdDev;
-        }
-    }
+    //get the average standard deviations of each block
+    var stdDevResult = Triangulate.getBlockStdDevs();
 
-    var remainingPoints = threshold - points;
-    var stdDevIdx = 0;
+    var stdDevs = stdDevResult[0];
+    var sumStdDev = stdDevResult[1];
+
+    var idx = 0;
+    var remPoints = Math.ceil(n * .9); //again, assumption
 
     //allocate tickets for each block
-    for (var i = 0; i < image.height; i+= blockHeight){
-        for (var j = 0; j < image.width; j += blockWidth){
-            var curTickets = Math.floor((stdDevs[stdDevIdx++]/sumStdDev) * remainingPoints);
-            var curNodes = Triangulate.getPointsInBlock(image, curTickets, i, j, blockHeight, blockWidth);
 
-            nodeArray.push.apply(nodeArray, curNodes);
+    for (var i = 0; i < Triangulate.blocksPerCol; i++){
+        for (var j = 0; j < Triangulate.blocksPerRow; j++){
+            var n = Math.floor((stdDevs[idx++]/sumStdDev) * remPoints);
+            var newNodes = Triangulate.getPointsInBlock(n, i * Triangulate.blockHeight, j * Triangulate.blockWidth);
+
+            nodeArray.push.apply(nodeArray, newNodes);
         }
     }
 
-    console.log(nodeArray);
     return nodeArray;
 }
-
-/*
-   Triangulate.getIndexFromCoordinate = function ( x, y ){
-   for (var i = 0; i < nodeList.length; i++){
-   if (x == nodeList[i].x && y == nodeList[i].y) return i;
-   }
-
-   return -1;
-   }
-
-   Triangulate.getIndexesFromEdge = function( curEdge ) {
-   var indexes = [];
-
-//get source
-var sourceX = curEdge.source[0];
-var sourceY = curEdge.source[1];
-var sourceIdx = Triangulate.getIndexFromCoordinate(sourceX, sourceY);
-
-//get dest
-var destX = curEdge.target[0];
-var destY = curEdge.target[1];
-var destIdx = Triangulate.getIndexFromCoordinate(destX, destY);
-
-indexes.push(sourceIdx);
-indexes.push(destIdx);
-
-return indexes;
-}
-
-Triangulate.addEdges = function ( image ){
-var nodeCoords = Triangulate.getCoords();
-var edgeCoords = d3.geom.voronoi().links(nodeCoords);
-
-//go through each edge
-for (var i = 0; i < edgeCoords.length; i++){
-var curEdge = edgeCoords[i];
-var indexes = Triangulate.getIndexesFromEdge( curEdge );
-
-//make an object
-
-var adjNodes = "l" + indexes[0] + " l" + indexes[1];
-var link = {"source": indexes[0], "target": indexes[1], "class": adjNodes};
-linkList.push(link);
-}
-}
-
-Triangulate.updateTriangleSvgString = function( curTriangle ){
-//ok this is a little hairy stick with me here
-var classStr = curTriangle.className.baseVal;
-var tIndexes = classStr.split(" ");
-
-//get the three nodes from the nodeList
-var pointA = nodeList[tIndexes[0].substring(1, tIndexes[0].length)];
-var pointB = nodeList[tIndexes[1].substring(1, tIndexes[1].length)];
-var pointC = nodeList[tIndexes[2].substring(1, tIndexes[2].length)];
-
-var startPoint = { "x": pointA.x, "y": pointA.y };
-var relPointA = { "x": pointB.x - pointA.x, "y": pointB.y - pointA.y };
-var relPointB = { "x": pointC.x - pointB.x, "y": pointC.y - pointB.y };
-var hexVal = curTriangle.getAttribute("fill");
-var triangle = {"start": startPoint, "relA": relPointA, "relB": relPointB, "color": hexVal, "class": classStr };
-
-return Triangulate.getSvgStringFromTriangle(triangle);
-}
-
-Triangulate.getSvgStringFromTriangle = function(triangle){
-var x = triangle.start.x;
-var y = triangle.start.y;
-
-var ax = triangle.relA.x;
-var ay = triangle.relA.y;
-
-var bx = triangle.relB.x;
-var by = triangle.relB.y;
-
-var a = 'M ' + x + ' ' + y;
-var b = ' l ' + ax + ' ' + ay;
-var c = ' l ' + bx + ' ' + by;
-var z = ' z';
-var string = a + b + c + z;
-
-return string;
-}
-
-Triangulate.addTriangles = function ( image ) {
-    var nodeCoords = Triangulate.getCoords();
-    var triangleCoords = d3.geom.voronoi().triangles(nodeCoords);
-
-    for (var i = 0; i < triangleCoords.length; i++){
-        var curTriangle = triangleCoords[i];
-        var pointA = curTriangle[0];
-        var pointB = curTriangle[1];
-        var pointC = curTriangle[2];
-
-        var startPoint = { "x": pointA[0], "y": pointA[1] };
-        var relPointA = { "x": pointB[0] - pointA[0], "y": pointB[1] - pointA[1] };
-        var relPointB = { "x": pointC[0] - pointB[0], "y": pointC[1] - pointB[1] };
-
-        var hexVal = image.getPixel(startPoint.y, startPoint.x).toHex();
-
-        var aID = Triangulate.getIndexFromCoordinate(pointA[0], pointA[1]);
-        var bID = Triangulate.getIndexFromCoordinate(pointB[0], pointB[1]);
-        var cID = Triangulate.getIndexFromCoordinate(pointC[0], pointC[1]);
-
-        var classStr = "t" + aID + " t" + bID + " t" + cID;
-        var triangle = {"start": startPoint, "relA": relPointA, "relB": relPointB, "color": hexVal, "class": classStr };
-        triangleList.push(triangle);
-    }
-}
-*/
 
 Triangulate.getAverageColor = function(image, triangle){
     var xMin = Math.min(triangle[0][0], triangle[1][0], triangle[2][0]);
@@ -277,16 +231,32 @@ Triangulate.getAverageColor = function(image, triangle){
     var yMin = Math.min(triangle[0][1], triangle[1][1], triangle[2][1]);
     var yMax = Math.max(triangle[0][1], triangle[1][1], triangle[2][1]);
 
-    var sumColor = 0;
+    var sumR = 0;
+    var sumG = 0;
+    var sumB = 0;
 
     for (var i = yMin; i < yMax; i++){
         for (var j = xMin; j < xMax; j++){
-            sumColor += Triangulate.getDecimalFromPixel(image, i, j);
+            var decArray = Triangulate.getDecimalArrayFromPixel(image, i, j);
+
+            sumR += decArray[0];
+            sumG += decArray[1];
+            sumB += decArray[2];
         }
     }
 
-    var colorDec = Math.ceil(sumColor / ((xMax - xMin) * (yMax - yMin)));
-    var colorHex = colorDec.toString(16);
-    return colorHex;
+    var area = (xMax - xMin) * (yMax - yMin);
+
+    var R = Math.ceil(sumR / area);
+    var G = Math.ceil(sumG / area);
+    var B = Math.ceil(sumB / area);
+
+    var hexR = R.toString(16);
+    var hexG = G.toString(16);
+    var hexB = B.toString(16);
+
+    var hexString =  hexR + hexG + hexB;
+
+    return hexString;
 }
 
