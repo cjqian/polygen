@@ -2,20 +2,26 @@ var Triangulate = Triangulate || {};
 
 Triangulate.image;
 
-Triangulate.blockWidth; 
-Triangulate.blockHeight;
+Triangulate.triWidth;
+Triangulate.triHeight;
 
-Triangulate.blocksPerRow;
-Triangulate.blocksPerCol;
+Triangulate.triPerRow;
+Triangulate.triPerCol;
 
-Triangulate.blockStdDevs; //list of standard deviations for each list
+Triangulate.baseTriangles;
+/* 
+   2D array; each array is a row 
+   each element is a triangle
+   */
+
+//Triangulate.blockStdDevs; //list of standard deviations for each list
 /*
-[
-    block 0: [
-        [x, y], [x, y].....
-    ]
-]
-*/
+   [
+   block 0: [
+   [x, y], [x, y].....
+   ]
+   ]
+   */
 
 Triangulate.initImage = function(img){
     Triangulate.image = img;
@@ -24,24 +30,104 @@ Triangulate.initImage = function(img){
     Triangulate.image.height = img.height;
 }
 
+//TODO what is the word for this?? mask??
+Triangulate.mask = function( x , isWidth ) {
+    if ( x < 0 ) return 0;
+
+    if (isWidth){
+        return Math.min(x, Triangulate.image.width - 1);
+    } else {
+        return Math.min(x, Triangulate.image.height - 1);
+    }
+}
+
+Triangulate.addTriangle = function(array, top, left, right, upright){
+    var triangle = {"topPoint": top, "leftPoint": left, "rightPoint": right, "isUpright": upright};
+    array.push(triangle);
+
+    return triangle;
+}
 
 //returns n uniform points with some skew
 Triangulate.getUniformPoints = function ( skew ){
+    Triangulate.baseTriangles = [];
     var nodeArray = [];
 
-    for (var i = Triangulate.blockHeight/2; i < Triangulate.image.height; i+= Triangulate.blockHeight){
-        for (var j = Triangulate.blockWidth/2; j < Triangulate.image.width; j+= Triangulate.blockWidth){
-            var curNode = [];
+    for (var i = 0; i < Triangulate.image.height; i += Triangulate.triHeight){
+        var rowTriangles = [];
+        //even row
+        if ((i / Triangulate.triHeight) % 2 == 0){
+            var isUpright = true;
 
-            //randomness up to 1% of the image width/height
-            var randomX = Math.ceil((Math.random() - .5) * Triangulate.image.width * skew);
-            var randomY = Math.ceil((Math.random() - .5) * Triangulate.image.height * skew);
+            //add the initial half triangle
+            var topPoint = [0, i];
+            var leftPoint = [0, i + Triangulate.triHeight];
+            var rightPoint = [Math.floor(Triangulate.triWidth / 2), i + Triangulate.triHeight];
 
-            curNode.push(j + randomX);
-            curNode.push(i + randomY);
+            //push the points
+            nodeArray.push(topPoint);
+            nodeArray.push(leftPoint);
+            nodeArray.push(rightPoint);
 
-            nodeArray.push(curNode);
+            var prevTriangle = Triangulate.addTriangle(rowTriangles, topPoint, leftPoint, rightPoint, isUpright);
+
+            for (var j = Triangulate.triWidth; j <= Triangulate.image.width; j += Triangulate.triWidth){
+                //push the first triangle
+                isUpright = !isUpright;
+
+                var newPoint = [Triangulate.mask(j, true), Triangulate.mask(i, false)];
+                nodeArray.push(newPoint);
+
+                prevTriangle = Triangulate.addTriangle(rowTriangles, prevTriangle.rightPoint, prevTriangle.topPoint, newPoint, isUpright);
+
+                //push the second triangle
+                isUpright = !isUpright;
+
+                newPoint = [Triangulate.mask(j + Math.floor(Triangulate.triWidth / 2), true), Triangulate.mask(i + Triangulate.triHeight, false)];
+                nodeArray.push(newPoint);
+
+                prevTriangle = Triangulate.addTriangle(rowTriangles, prevTriangle.rightPoint, prevTriangle.topPoint, newPoint, isUpright);
+            }
+        } 
+
+        //odd row
+        else {
+            var isUpright = false;
+
+            //add the initial half triangle
+            var topPoint = [0, i + Triangulate.triHeight];
+            var leftPoint = [0, i];
+            var rightPoint = [Math.floor(Triangulate.triWidth / 2), i]; 
+
+            //last row
+            if (Triangulate.image.height - i <= Triangulate.triHeight){
+                nodeArray.push(topPoint);
+            }
+
+            var prevTriangle = Triangulate.addTriangle(rowTriangles, topPoint, leftPoint, rightPoint, isUpright);
+
+            for (var j = Triangulate.triWidth; j <= Triangulate.image.width; j += Triangulate.triWidth){
+                //push the first triangle
+                isUpright = !isUpright;
+
+                var newPoint = [Triangulate.mask(j, true), Triangulate.mask(i + Triangulate.triHeight, false)];
+
+                if (Triangulate.image.height - i <= Triangulate.triHeight) nodeArray.push(newPoint);
+
+                prevTriangle = Triangulate.addTriangle(rowTriangles, prevTriangle.rightPoint, prevTriangle.topPoint, newPoint, isUpright);
+
+                //push the second triangle
+                isUpright = !isUpright;
+
+                newPoint = [Triangulate.mask(j + Math.floor(Triangulate.triWidth / 2), true), Triangulate.mask(i, false)];
+
+                if (Triangulate.image.height - i <= Triangulate.triHeight) nodeArray.push(newPoint);
+
+                prevTriangle = Triangulate.addTriangle(rowTriangles, prevTriangle.rightPoint, prevTriangle.topPoint, newPoint, isUpright);
+            }
         }
+
+        Triangulate.baseTriangles.push(rowTriangles);
     }
 
     return nodeArray;
@@ -105,21 +191,6 @@ Triangulate.getDecimalArrayFromPixel = function(image, i, j){
     return hexVals;
 }
 
-
-Triangulate.resetThreshold = function( n ){
-    var points = n/10; // 1/10 of total points atm, should be variable
-    var pointsSqrt = Math.ceil(Math.sqrt(points));
-
-    Triangulate.blockWidth = Math.ceil(Triangulate.image.width / pointsSqrt);
-    Triangulate.blockHeight = Math.ceil(Triangulate.image.height / pointsSqrt);
-
-    Triangulate.blocksPerRow = Math.floor(Triangulate.image.width / Triangulate.blockWidth);
-    Triangulate.blocksPerCol = Math.floor(Triangulate.image.height / Triangulate.blockHeight);
-
-    Triangulate.blockStdDevs = new Array(Triangulate.blocksPerRow * Triangulate.blocksPerCol);
-}
-
-
 Triangulate.toIdx = function(i, j){
     return (i * Triangulate.blocksPerRow + j);
 }
@@ -173,7 +244,7 @@ Triangulate.getAvgStdDev = function(y, x){
 }
 
 //returns an array of standard deviations for each block
-Triangulate.getBlockStdDevs = function(){
+Triangulate.getTriStdDevs = function(){
     var stdDevs = [];
 
     var sumStdDevs = 0;
@@ -193,6 +264,19 @@ Triangulate.getBlockStdDevs = function(){
     return resList;
 }
 
+Triangulate.resetThreshold = function ( n ){
+    var points = n / 10 / 2; // we want 10% of the points ot be fixed
+    var pointsSqrt = Math.ceil(Math.sqrt(points));
+
+    Triangulate.triWidth = Math.ceil(Triangulate.image.width / pointsSqrt);
+    Triangulate.triHeight = Math.ceil(Triangulate.image.height / pointsSqrt);
+
+    Triangulate.triPerRow = Math.floor(Triangulate.image.width / Triangulate.triWidth);
+    Triangulate.triPerCol = Math.floor(Triangulate.image.height / Triangulate.triHeight);
+
+    //Triangulate.blockStdDevs = new Array(Triangulate.blocksPerRow * Triangulate.blocksPerCol);
+}
+
 //returns an array of the most significant points
 Triangulate.getVertices = function ( n , rand){
     Triangulate.resetThreshold( n );
@@ -200,8 +284,9 @@ Triangulate.getVertices = function ( n , rand){
     //start with a uniform mesh with 10% of our points
     var nodeArray = Triangulate.getUniformPoints(rand);
 
+    /*
     //get the average standard deviations of each block
-    var stdDevResult = Triangulate.getBlockStdDevs();
+    var stdDevResult = Triangulate.getTriStdDevs();
 
     var stdDevs = stdDevResult[0];
     var sumStdDev = stdDevResult[1];
@@ -212,13 +297,16 @@ Triangulate.getVertices = function ( n , rand){
     //allocate tickets for each block
 
     for (var i = 0; i < Triangulate.blocksPerCol; i++){
-        for (var j = 0; j < Triangulate.blocksPerRow; j++){
-            var n = Math.floor((stdDevs[idx++]/sumStdDev) * remPoints);
-            var newNodes = Triangulate.getPointsInBlock(n, i * Triangulate.blockHeight, j * Triangulate.blockWidth);
+    for (var j = 0; j < Triangulate.blocksPerRow; j++){
+    var n = Math.floor((stdDevs[idx++]/sumStdDev) * remPoints);
+    var newNodes = Triangulate.getPointsInBlock(n, i * Triangulate.blockHeight, j * Triangulate.blockWidth);
 
-            nodeArray.push.apply(nodeArray, newNodes);
-        }
+    nodeArray.push.apply(nodeArray, newNodes);
     }
+    }
+
+    console.log(nodeArray);
+    */
 
     return nodeArray;
 }
