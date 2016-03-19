@@ -229,18 +229,18 @@ Triangulate.getY = function(idx){
 //this assumes that the pixelStdDev array is filled out
 Triangulate.getAvgPixVal = function(row, triangle){
     var sumPixVal = 0;
-    
+
     var curTriangle = Triangulate.baseTriangles[row][triangle];
 
-        for (var i = 0; i < Triangulate.triHeight; i++){
-            for (var j = curTriangle.leftBorder[i]; j < curTriangle.rightBorder[i]; j++){
-                if (curTriangle.isUpright){
-                    sumPixVal += Triangulate.getDecimalFromPixel(curTriangle.topPoint[1] + i, j);
-                } else {
-                    sumPixVal += Triangulate.getDecimalFromPixel(curTriangle.topPoint[1] - i, j);
-                }
+    for (var i = 0; i < Triangulate.triHeight; i++){
+        for (var j = curTriangle.leftBorder[i]; j < curTriangle.rightBorder[i]; j++){
+            if (curTriangle.isUpright){
+                sumPixVal += Triangulate.getDecimalFromPixel(curTriangle.topPoint[1] + i, j);
+            } else {
+                sumPixVal += Triangulate.getDecimalFromPixel(curTriangle.topPoint[1] - i, j);
             }
         }
+    }
 
     var height = Triangulate.triHeight;
     var width = curTriangle.rightPoint[0] - curTriangle.leftPoint[0]; //will be smaller for corner triangles
@@ -277,7 +277,7 @@ Triangulate.getTriStdDev = function(row, triangle){
                 var y = curTriangle.topPoint[1] - i;
             }
 
-                var curDiff = Triangulate.getDecimalFromPixel(y, j) - avgPixVal;
+            var curDiff = Triangulate.getDecimalFromPixel(y, j) - avgPixVal;
             var curDiffSq = curDiff * curDiff; //necessary for positive value
             var curStdDevObj = {"x": j, "y": y, "val": curDiffSq};
             curTriangleStdDevs.push(curStdDevObj);
@@ -350,7 +350,6 @@ Triangulate.getVertices = function ( n , rand){
 
     //start with a uniform mesh with 10% of our points
     var nodeArray = Triangulate.getUniformPoints(rand);
-    console.log(Triangulate.baseTriangles);
 
     //get the average standard deviations of each block
     var stdDevResult = Triangulate.getTriStdDevs();
@@ -374,7 +373,7 @@ Triangulate.getVertices = function ( n , rand){
 
     console.log(nodeArray);
 
-      return nodeArray;
+    return nodeArray;
 }
 
 Triangulate.getAverageColor = function(image, triangle){

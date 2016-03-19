@@ -6,7 +6,7 @@ Main.image;
 Main.canvas = document.getElementById('canvas');
 Main.context = Main.canvas.getContext('2d');
 
-Main.createImage = function(imagePath){
+Main.createImage = function(imagePath, nVertices, nRand){
     //now, we call the equivalent of ("image change callback")
     var imageObj = document.createElement('img');
     imageObj.setAttribute("id", "image");
@@ -25,11 +25,11 @@ Main.createImage = function(imagePath){
         //we get the data and make an actual image
         var imageData = Main.context.getImageData(0, 0, imageObj.width, imageObj.height);
         Main.image = new Img(imageObj.width, imageObj.height, imageData.data);
-        Main.setupImage();
+        Main.setupImage(nVertices, nRand);
     };
 }
 
-Main.setupImage = function() {
+Main.setupImage = function(nVertices, nRand) {
     Voronoi.clearCanvas();
 
     //amount of randomness
@@ -40,7 +40,7 @@ Main.setupImage = function() {
     if (typeof ie != 'undefined')
         Main.updateImage(ie.nVertices, ie.nRand);
     else
-        Main.updateImage(600, .01);
+        Main.updateImage(nVertices, nRand);
 }
 
 Main.updateImage = function(nVertices, nRand){

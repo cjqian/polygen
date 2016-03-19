@@ -8,6 +8,7 @@
 <link rel="stylesheet" href="css/voronoi.css">
 
 <script src="lib/d3.js" charset="utf-8"></script>
+
 </head>
 
 <body>
@@ -16,14 +17,17 @@
 <script src="js/triangulate.js"></script>
 
 <script type="text/javascript" src="js/gui.js"></script>
+<script> console.log("HELLO");</script>
 <script src="js/main.js"></script>
+<script src="js/url.js"><script>
 
 <input id="file" type="file" style="visibility:hidden"/>
 
 <script>
-//Main.createImage('selfie.jpg');
-    Main.createImage('city.jpg');
+    console.log(window.location.search);
+    Url.handleUrl(window.location.search.toString());
 </script>
+
 <script src="js/voronoi.js"></script>
 </body>
 </html>
