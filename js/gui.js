@@ -9,6 +9,10 @@ var ImageEditor = function() {
 
     //modes
     this.addMode = true;
+
+    //save function
+    this.saveName='city';
+    this.saveButton=false;
 };
 
 window.onload = function() {
@@ -39,5 +43,10 @@ window.onload = function() {
     });
     gui.add(ie, 'addMode').onChange(function(changeValue){
         Voronoi.toggleAddMode(changeValue);
+    });
+
+    gui.add(ie, 'saveName');
+    gui.add(ie, 'saveButton').onChange(function(){
+        Main.saveImage(ie.saveName);
     });
 };

@@ -48,3 +48,17 @@ Main.updateImage = function(nVertices, nRand){
     var vertices = Triangulate.getVertices(nVertices, nRand);
     Voronoi.updateDots(vertices);
 }
+
+Main.saveImage = function(saveName){
+    console.log("saving image " + saveName);
+    //store object
+    var obj = {};
+    obj.voronoi = Voronoi.makeObject();
+    obj.triangulate = Triangulate.makeObject();
+    var objStr = JSON.stringify(obj);
+
+    //save file
+    var filePath = "/tri/" + saveName + ".tri";
+    var file = new File([objStr], filePath, {type: "text/plain"});
+}
+

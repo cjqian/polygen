@@ -18,6 +18,27 @@ Voronoi.image;
 
 var dotsAttr, drag;
 var addMode = true;
+
+Voronoi.makeObject = function(){
+    var obj = {};
+
+    obj.image = Voronoi.image;
+    obj.width = width;
+    obj.height = height;
+    obj.svg = svg;
+    obj.myVoronoi = myVoronoi;
+
+    obj.voronoiG = voronoiG;
+    obj.triangles = triangles;
+    obj.dotsAttr = dotsAttr;
+    obj.drag = drag;
+    obj.addMode = addMode;
+    obj.show = show;
+
+    return obj;
+}
+
+
 Voronoi.clearCanvas = function(){
     d3.select('svg').remove();
 }
@@ -263,9 +284,6 @@ Voronoi.updateVoronoi = function(data) {
     .classed("hidden", !show.triangles);
 
     myTriangles.exit().remove();
-
-
-
 }
 
 // circumcenter equation from wikipedia: http://en.wikipedia.org/wiki/Circumscribed_circle

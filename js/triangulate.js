@@ -1,3 +1,4 @@
+//jsdo ithttp://jsdo.it/akm2/xoYx
 var Triangulate = Triangulate || {};
 
 Triangulate.image;
@@ -23,6 +24,124 @@ Triangulate.triStdDevs;
    ]
    ]
    */
+        Triangulate.getEdgePoints = function( image_data, sensitivity, accuracy )
+        {
+            var multiplier = parseInt( ( accuracy || 0.1 ) * 10, 10 ) || 1;
+            var edge_detect_value = sensitivity;
+            var width  = image_data.width;
+            var height = image_data.height;
+            var data = image_data.data;
+            var points = [ ];
+            var x, y, row, col, sx, sy, step, sum, total;
+
+            for ( y = 0; y < height; y += multiplier )
+            {
+                for ( x = 0; x < width; x += multiplier )
+                {
+                    sum = total = 0;
+
+                    for ( row = -1; row <= 1; row++ )
+                    {
+                        sy = y + row;
+                        step = sy * width;
+
+                        if ( sy >= 0 && sy < height )
+                        {
+                            for ( col = -1; col <= 1; col++ )
+                            {
+                                sx = x + col;
+
+                                if ( sx >= 0 && sx < width )
+                                {
+                                    sum += data[( sx + step ) << 2]; 
+                                    total++;
+                                }
+                            }
+                        }
+                    }
+
+                    if ( total )
+                    {
+                        sum /= total;
+                    }
+
+                    if ( sum > edge_detect_value )
+                    {
+                        points.push( [ x, y ]);
+                        //points.push( { x: x, y: y } );
+                    }
+                }
+            }
+            console.log(points);
+            return points;
+        }
+
+Triangulate.getRandomVertices = function( points, rate, max_num, accuracy, width, height )
+        {
+            var j;
+            var result = [ ];
+            var i = 0;
+            var i_len = points.length;
+            var t_len = i_len;
+            var limit = Math.round( i_len * rate );
+
+            if ( limit > max_num )
+            {
+                limit = max_num;
+            }
+
+            while ( i < limit && i < i_len )
+            {
+                j = t_len * Math.random() | 0;
+                result.push( [ points[j][0], points[j][1] ]);
+                //result.push( [points[j].x, points[j].y] );
+                //result.push( { x: points[j].x, y: points[j].y } );
+
+                // this seems to be extremely time
+                // intensive.
+                // points.splice( j, 1 );
+
+                t_len--;
+                i++;
+            }
+
+            var x, y;
+            // gf: add more points along the edges so we always use the full canvas,
+            for ( x = 0; x < width; x += (100 - accuracy) )
+            {
+                result.push( [ ~~x, 0 ] );
+                result.push( [ ~~x, height ] );
+                //result.push( { x: ~~x, y: 0 } );
+                //result.push( { x: ~~x, y: height } );
+            }
+
+            for ( y = 0; y < height; y += (100 - accuracy) )
+            {
+                result.push( [ 0, ~~y ] );
+                result.push( [ width, ~~y ]);
+                //result.push( { x: 0, y: ~~y } );
+                //result.push( { x: width, y: ~~y } );
+            }
+
+            result.push( [0, height] );
+            result.push( [width, height] );
+            //result.push( { x: 0, y: height } );
+            //result.push( { x: width, y: height } );
+
+            return result;
+        }
+
+Triangulate.makeObject = function(){
+    var obj = {};
+
+    obj.image = Triangulate.image;
+    obj.triWidth = Triangulate.triWidth;
+    obj.triHeight = Triangulate.triHeight;
+    obj.triPerRow = Triangulate.triPerRow;
+    obj.triPerCol = Triangulate.triPerCol;
+    obj.baseTriangles = Triangulate.baseTriangles;
+    obj.triStdDevs = Triangulate.triStdDevs;
+}
 
 Triangulate.initImage = function(img){
     Triangulate.image = img;
@@ -346,6 +465,7 @@ Triangulate.resetThreshold = function ( n ){
 
 //returns an array of the most significant points
 Triangulate.getVertices = function ( n , rand){
+    /*
     Triangulate.resetThreshold( n );
 
     //start with a uniform mesh with 10% of our points
@@ -372,7 +492,12 @@ Triangulate.getVertices = function ( n , rand){
     }
 
     console.log(nodeArray);
-
+    console.log(Triangulate.getEdgePoints(Triangulate.image, 50, .55));
+*/
+var nodePoints = Triangulate.getEdgePoints(Triangulate.image, 50, .55);
+//var nodeArray = Triangulate.getRandomVertices(nodePoints, .0505, 2000, .55, Triangulate.image.width, Triangulate.image.height);
+var nodeArray = Triangulate.getRandomVertices(nodePoints, .0505, 2000, .55, 600, 500);
+console.log(nodeArray);
     return nodeArray;
 }
 
