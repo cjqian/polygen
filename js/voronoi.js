@@ -279,7 +279,7 @@ Voronoi.updateVoronoi = function(data) {
         })
     .attr("class", "triangles")
         .style("fill", function(d){
-            return Triangulate.getAverageColor(Voronoi.image, d);
+            return Triangulate.getAverageColor(d);
         })
     .classed("hidden", !show.triangles);
 

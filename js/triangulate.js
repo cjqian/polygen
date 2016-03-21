@@ -25,6 +25,22 @@ Triangulate.triStdDevs;
    ]
    ]
    */
+
+//makes Triangulate.greyImage out of Triangulate.image;
+Triangulate.makeGreyscale = function () {
+    var emptyData = new Array(Triangulate.image.width * Triangulate.image.height);
+    Triangulate.greyImage = new Img(Triangulate.image.width, Triangulate.image.height, emptyData);
+
+    for (var i = 0; i < Triangulate.image.height; i++){
+        for (var j = 0; j < Triangulate.image.width; j++){
+            var curPixel = Triangulate.image.getPixel(i, j);
+            var brightness = .34 * curPixel.r + .5 * curPixel.g + .16 * curPixel.b;
+            var newPixel = new Pixel(brightness, brightness, brightness);
+            Triangulate.greyImage.setPixel(i, j, newPixel);
+        }
+    }
+}
+
 Triangulate.getEdgePoints = function( sensitivity, accuracy )
 {
     var multiplier = parseInt( ( accuracy || 0.1 ) * 10, 10 ) || 1;
@@ -145,8 +161,8 @@ Triangulate.makeObject = function(){
 }
 
 Triangulate.initImage = function(img){
-    
-    Triangulate.greyImage = img;
+    Triangulate.image = img; 
+    Triangulate.makeGreyscale();
 
     Triangulate.greyImage.width = img.width;
     Triangulate.greyImage.height = img.height;
@@ -320,8 +336,8 @@ Triangulate.getDecimalFromPixel = function(i, j){
     return curPixelDec;
 }
 
-Triangulate.getDecimalArrayFromPixel = function(image, i, j){
-    var curPixelColor = image.getPixel(i, j).toHex();
+Triangulate.getDecimalArrayFromPixel = function(i, j){
+    var curPixelColor = Triangulate.image.getPixel(i, j).toHex();
     var curPixelHex = curPixelColor.toString().substring(1, curPixelColor.length);
 
     var hexVals = [];
@@ -501,7 +517,7 @@ Triangulate.getVertices = function ( n , rand){
     return nodeArray;
 }
 
-Triangulate.getAverageColor = function(image, triangle){
+Triangulate.getAverageColor = function(triangle){
     var xMin = Math.min(triangle[0][0], triangle[1][0], triangle[2][0]);
     var xMax = Math.max(triangle[0][0], triangle[1][0], triangle[2][0]);
 
@@ -514,7 +530,7 @@ Triangulate.getAverageColor = function(image, triangle){
 
     for (var i = yMin; i < yMax; i++){
         for (var j = xMin; j < xMax; j++){
-            var decArray = Triangulate.getDecimalArrayFromPixel(image, i, j);
+            var decArray = Triangulate.getDecimalArrayFromPixel(i, j);
 
             sumR += decArray[0];
             sumG += decArray[1];
