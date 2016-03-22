@@ -35,6 +35,29 @@ window.onload = function() {
         Main.updateImage(ie.nVertices, newRand); 
     });
 
+    /*
+    gui.add(ie, 'nSensitivity', 10, 5000).step(1).onFinishChange(function(newVert){
+        Voronoi.clearDots();
+
+        Main.updateImage(newVert, ie.nRand);
+    });
+
+
+    gui.add(ie, 'nAccuracy', 10, 5000).step(1).onFinishChange(function(newVert){
+        Voronoi.clearDots();
+
+        Main.updateImage(newVert, ie.nRand);
+    });
+
+
+     gui.add(ie, 'nVertices', 10, 5000).step(1).onFinishChange(function(newVert){
+        Voronoi.clearDots();
+
+        Main.updateImage(newVert, ie.nRand);
+    });
+    */
+   
+    //show, edit
     gui.add(ie, 'showTriangles').onChange(function(changeValue){
         Voronoi.toggleShowTriangles(changeValue);
     });
@@ -45,6 +68,7 @@ window.onload = function() {
         Voronoi.toggleAddMode(changeValue);
     });
 
+    //save function
     gui.add(ie, 'saveName');
     gui.add(ie, 'saveButton').onChange(function(){
         Main.saveImage(ie.saveName);

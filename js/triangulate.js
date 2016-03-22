@@ -12,6 +12,12 @@ Triangulate.triPerCol;
 
 Triangulate.baseTriangles;
 Triangulate.triStdDevs;
+
+Triangulate.n = -1; 
+
+Triangulate.uniformPoints;
+Triangulate.edgePoints;
+
 /* 
    2D array; each array is a row 
    each element is a triangle
@@ -93,8 +99,13 @@ Triangulate.getEdgePoints = function( sensitivity, accuracy )
     return points;
 }
 
-Triangulate.getRandomVertices = function( points, rate, max_num, accuracy, width, height )
+Triangulate.getRandomVertices = function( points, rate, max_num, accuracy)
 {
+    //max num is the number of vertices
+ 
+    var width = Triangulate.image.width;
+    var height = Triangulate.image.height;
+
     var j;
     var result = [ ];
     var i = 0;
@@ -163,7 +174,7 @@ Triangulate.makeObject = function(){
 Triangulate.initImage = function(img){
     Triangulate.image = img; 
     Triangulate.makeGreyscale();
-
+    console.log(Triangulate.image.data);
     Triangulate.greyImage.width = img.width;
     Triangulate.greyImage.height = img.height;
 }
@@ -217,7 +228,7 @@ Triangulate.addTriangle = function(array, top, left, right, upright){
 }
 
 //returns n uniform points with some skew
-Triangulate.getUniformPoints = function ( skew ){
+Triangulate.getUniformPoints = function (){
     Triangulate.baseTriangles = [];
     var nodeArray = [];
 
@@ -469,6 +480,7 @@ Triangulate.getTriStdDevs = function(){
 }
 
 Triangulate.resetThreshold = function ( n ){
+    Triangulate.n = n;
     var points = n / 10 / 2; // we want 10% of the points ot be fixed
     var pointsSqrt = Math.ceil(Math.sqrt(points));
 
@@ -483,37 +495,46 @@ Triangulate.resetThreshold = function ( n ){
 
 //returns an array of the most significant points
 Triangulate.getVertices = function ( n , rand){
-    Triangulate.resetThreshold( n );
+    if (n > Triangulate.n){
+        Triangulate.resetThreshold( n );
+    }
 
-    //start with a uniform mesh with 10% of our points
-    var nodeArray = Triangulate.getUniformPoints(rand);
+    var nodeArray = Triangulate.getUniformPoints(); 
 
     //get the average standard deviations of each block
     var stdDevResult = Triangulate.getTriStdDevs();
 
     var stdDevs = stdDevResult[0];
     var sumStdDev = stdDevResult[1];
-    console.log(stdDevs);
-    console.log(sumStdDev);
 
     var idx = 0;
+
     var remPoints = n - (Triangulate.baseTriangles.length * Triangulate.baseTriangles[1].length);
 
+    //add the randomized points-- NOTE: what happens with repeat points? this is entirely feasible
+    var randPoints = rand * remPoints || 0; //a percentage of these remaining points are set at random
+    for (var i = 0; i < randPoints; i++){
+        //get the random x coordinate
+        var x = Math.round(Math.random() * Triangulate.image.width);
+        var y = Math.round(Math.random() * Triangulate.image.height);
+
+        var curNode = [ x, y ];
+        nodeArray.push(curNode);
+    }
+
+    //add the standard edge-detect points
+    var standardPoints = remPoints - randPoints;
     for (var i = 0; i < Triangulate.baseTriangles.length; i++){
         for (var j = 0; j < Triangulate.baseTriangles[i].length; j++){
-            var n = Math.round(( stdDevs[i][j] / sumStdDev ) * remPoints);
+            var n = Math.round(( stdDevs[i][j] / sumStdDev ) * standardPoints);
             var triNodes = Triangulate.getTriPoints(n, i, j);         
 
             nodeArray.push.apply(nodeArray, triNodes);
         }
     }
 
-    console.log(nodeArray);
-    console.log(Triangulate.getEdgePoints(Triangulate.greyImage, 50, .55));
     //var nodePoints = Triangulate.getEdgePoints( 50, .55);
-    //var nodeArray = Triangulate.getRandomVertices(nodePoints, .0505, n, .55, Triangulate.greyImage.width, Triangulate.greyImage.height);
-    //var nodeArray = Triangulate.getRandomVertices(nodePoints, .0505, 2000, .55, 600, 500);
-    console.log(nodeArray);
+    //var nodeArray = Triangulate.getRandomVertices(nodePoints, .0505, n, .55);
     return nodeArray;
 }
 

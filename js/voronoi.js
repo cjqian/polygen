@@ -16,7 +16,7 @@ var voronoiG, triangles;
 var show;
 Voronoi.image;
 
-var dotsAttr, drag;
+var dotsAttr, dotsBehavior, drag;
 var addMode = true;
 
 Voronoi.makeObject = function(){
@@ -31,6 +31,7 @@ Voronoi.makeObject = function(){
     obj.voronoiG = voronoiG;
     obj.triangles = triangles;
     obj.dotsAttr = dotsAttr;
+    obj.dotsBehavior = dotsBehavior;
     obj.drag = drag;
     obj.addMode = addMode;
     obj.show = show;
@@ -95,10 +96,18 @@ Voronoi.initCanvas = function(image){
     // dot attributes
     dotsAttr = {cx: function(d){return d[0]},
         cy:function(d){return d[1]},
-        r: 5,
-        fill: "blue"}
-
-
+        r: 8,
+        fill:"transparent"
+        }
+    
+    dotsBehavior = {
+        mouseover: function(d){
+            d3.select(this).style("fill", "red");
+        },
+        mouseout: function(d){
+            d3.select(this).style("fill", "transparent");
+        }
+    }
     // set up drag for circles
     drag = d3.behavior.drag()
         .on("drag", dragmove);
@@ -146,12 +155,17 @@ Voronoi.toggleAddMode = function(toggle){
             }
 
 }
+
+Voronoi.toggleShowMesh = function(toggle){
+
+}
+
 Voronoi.toggleShowPolygons = function(toggle){
     show.voronoi = toggle; 
     d3.selectAll(".voronoi").classed("hidden", !show.voronoi);
 }
-Voronoi.toggleShowTriangles = function(toggle){
 
+Voronoi.toggleShowTriangles = function(toggle){
     show.triangles = toggle; 
     d3.selectAll(".triangles").classed("hidden", !show.triangles);
 }
@@ -171,6 +185,7 @@ Voronoi.removeDot = function(coord) {
     dots = svg.selectAll(".dots").data(data);
 
     dots.attr(dotsAttr);
+    dots.on(dotsBehavior);
 
     Voronoi.updateVoronoi(data);
 }
@@ -188,10 +203,12 @@ Voronoi.updateDot = function(coord) {
         dots = svg.selectAll(".dots").data(data);
 
     dots.attr(dotsAttr);
+    dots.on(dotsBehavior);
 
     dots.enter()
         .append("circle")
         .attr(dotsAttr)
+        .on(dotsBehavior)
         .classed("dots", true)
         .call(drag);
 
@@ -212,10 +229,12 @@ Voronoi.updateDots = function(coords) {
         dots = svg.selectAll(".dots").data(data);
 
     dots.attr(dotsAttr);
+    dots.on(dotsBehavior);
 
     dots.enter()
         .append("circle")
         .attr(dotsAttr)
+        .on(dotsBehavior)
         .classed("dots", true)
         .call(drag);
 
