@@ -6,7 +6,7 @@ Main.image;
 Main.canvas = document.getElementById('canvas');
 Main.context = Main.canvas.getContext('2d');
 
-Main.createImage = function(imagePath, nVertices, nRand){
+Main.createImage = function(imagePath, nAccuracy, nSensitivity, nRand){
     //now, we call the equivalent of ("image change callback")
     var imageObj = document.createElement('img');
     imageObj.setAttribute("id", "image");
@@ -25,11 +25,11 @@ Main.createImage = function(imagePath, nVertices, nRand){
         //we get the data and make an actual image
         var imageData = Main.context.getImageData(0, 0, imageObj.width, imageObj.height);
         Main.image = new Img(imageObj.width, imageObj.height, imageData.data);
-        Main.setupImage(nVertices, nRand);
+        Main.setupImage(nAccuracy, nSensitivity, nRand);
     };
 }
 
-Main.setupImage = function(nVertices, nRand) {
+Main.setupImage = function(nAccuracy, nSensitivity, nRand) {
     Voronoi.clearCanvas();
 
     //amount of randomness
@@ -37,15 +37,13 @@ Main.setupImage = function(nVertices, nRand) {
     Voronoi.initCanvas(Main.image);
 
     //if (typeof(ie.nVertices) != "undefined" && typeof(ie.nRand) !=  "undefined")
-    if (typeof ie != 'undefined')
-        Main.updateImage(ie.nVertices, ie.nRand);
-    else
-        Main.updateImage(nVertices, nRand);
+    //if (typeof ie != 'undefined')
+        //Main.updateImage(ie.nVertices, ie.nRand);
+        Main.updateImage(nAccuracy, nSensitivity, nRand);
 }
 
-Main.updateImage = function(nVertices, nRand){
-    console.log("Updating image with " + nVertices + " and rand " + nRand);
-    var vertices = Triangulate.getVertices(nVertices, nRand);
+Main.updateImage = function(nAccuracy, nSensitivity, nRand){
+    var vertices = Triangulate.getVertices(nAccuracy, nSensitivity, nRand);
     Voronoi.updateDots(vertices);
 }
 

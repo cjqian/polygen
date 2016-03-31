@@ -1,6 +1,5 @@
 var ImageEditor = function() {
     this.imageURL='city.jpg';
-    this.nVertices = 600;
     this.nRand = .01;
 
     //boolean values
@@ -13,6 +12,10 @@ var ImageEditor = function() {
     //save function
     this.saveName='city';
     this.saveButton=false;
+
+    //ways to modify
+    this.nAccuracy = 10;
+    this.nSensitivity = 5;
 };
 
 window.onload = function() {
@@ -23,39 +26,28 @@ window.onload = function() {
         Main.createImage(newName);
     });
 
-    gui.add(ie, 'nVertices', 10, 5000).step(1).onFinishChange(function(newVert){
+    gui.add(ie, 'nRand', 0, 1).onFinishChange(function(nRand){
         Voronoi.clearDots();
 
-        Main.updateImage(newVert, ie.nRand);
+        Main.updateImage(ie.nAccuracy, ie.nSensitivity, nRand); 
     });
 
-    gui.add(ie, 'nRand', 0, 1).onFinishChange(function(newRand){
+    var minParam = Math.min(Main.image.width, Main.image.height);
+    var nSensitivityThreshold = Math.floor(minParam / ie.nAccuracy);
+    gui.add(ie, 'nSensitivity', 1, nSensitivityThreshold).step(1).onFinishChange(function(nSensitivity){
+        console.log("changed to " + ie.nSensitivity);
         Voronoi.clearDots();
 
-        Main.updateImage(ie.nVertices, newRand); 
-    });
-
-    /*
-    gui.add(ie, 'nSensitivity', 10, 5000).step(1).onFinishChange(function(newVert){
-        Voronoi.clearDots();
-
-        Main.updateImage(newVert, ie.nRand);
+        Main.updateImage(ie.nAccuracy, nSensitivity, ie.nRand);
     });
 
 
-    gui.add(ie, 'nAccuracy', 10, 5000).step(1).onFinishChange(function(newVert){
+    gui.add(ie, 'nAccuracy', 2, 100).step(1).onFinishChange(function(nAccuracy){
         Voronoi.clearDots();
 
-        Main.updateImage(newVert, ie.nRand);
+        Main.updateImage(nAccuracy, ie.nSensitivity, ie.nRand);
     });
 
-
-     gui.add(ie, 'nVertices', 10, 5000).step(1).onFinishChange(function(newVert){
-        Voronoi.clearDots();
-
-        Main.updateImage(newVert, ie.nRand);
-    });
-    */
    
     //show, edit
     gui.add(ie, 'showTriangles').onChange(function(changeValue){

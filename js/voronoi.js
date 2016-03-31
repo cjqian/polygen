@@ -255,6 +255,7 @@ Voronoi.updateVoronoi = function(data) {
             if(typeof(d) != 'undefined'){
                 return "M" + d.join("L") + "Z"}
         })
+
     .style("fill", "pink")
         .datum(function(d) {
             if(typeof(d) != 'undefined'){

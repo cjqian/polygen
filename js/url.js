@@ -43,15 +43,19 @@ Url.handleUrl = function(path){
         urlObject.imagePath = "city.jpg";
      }
 
-     if (typeof urlObject.nVertices == "undefined"){
-        urlObject.nVertices = 600;
+    if (typeof urlObject.nAccuracy == "undefined"){
+        urlObject.nAccuracy = 8;
+     }
+     if (typeof urlObject.nSensitivity == "undefined"){
+        urlObject.nSensitivity = 8;
      }
 
      if (typeof urlObject.nRand == "undefined"){
         urlObject.nRand = .01;
      }
 
-    Main.createImage(urlObject.imagePath, urlObject.nVertices, urlObject.nRand);
+    console.log(urlObject.nSensitivity);
+    Main.createImage(urlObject.imagePath, urlObject.nAccuracy, urlObject.nSensitivity, urlObject.nRand);
 }
 
 
