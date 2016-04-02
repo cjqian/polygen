@@ -298,6 +298,7 @@ Voronoi.updateVoronoi = function(data) {
             centerCircles.push(findCenters(d)); return d.join(" ")
         })
     .attr("class", "triangles")
+        .style("stroke-opacity", 0)
         .style("fill", function(d){
             return Triangulate.getAverageColor(d);
         })

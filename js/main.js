@@ -35,16 +35,17 @@ Main.setupImage = function(nAccuracy, nSensitivity, nRand) {
     //amount of randomness
     Triangulate.initImage(Main.image);
     Voronoi.initCanvas(Main.image);
-
     //if (typeof(ie.nVertices) != "undefined" && typeof(ie.nRand) !=  "undefined")
     //if (typeof ie != 'undefined')
         //Main.updateImage(ie.nVertices, ie.nRand);
         Main.updateImage(nAccuracy, nSensitivity, nRand);
 }
 
-Main.updateImage = function(nAccuracy, nSensitivity, nRand){
-    var vertices = Triangulate.getVertices(nAccuracy, nSensitivity, nRand);
-    Voronoi.updateDots(vertices);
+Main.updateImage = function(nAccuracy, nPoints, nRand, nSensitivity){
+    ThreeD.pointArray = Triangulate.getVertices(nAccuracy, nPoints,nRand,  nSensitivity);
+    Voronoi.updateDots(ThreeD.pointArray);
+
+    ThreeD.update();
 }
 
 Main.saveImage = function(saveName){

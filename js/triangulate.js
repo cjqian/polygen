@@ -22,6 +22,119 @@ Triangulate.initImage = function(img){
     Triangulate.image = img; 
 }
 
+
+Triangulate.getEdgePoints = function( sensitivity, accuracy )
+{
+    var multiplier = parseInt( ( accuracy || 0.1 ) * 10, 10 ) || 1;
+    console.log("Multiplier " + multiplier);
+    var edge_detect_value = sensitivity;
+    var width  = Triangulate.image.width;
+    var height = Triangulate.image.height;
+    var data = Triangulate.image.data;
+    var points = [ ];
+    var x, y, row, col, sx, sy, step, sum, total;
+
+    for ( y = 0; y < height; y += multiplier )
+    {
+        for ( x = 0; x < width; x += multiplier )
+        {
+            sum = total = 0;
+
+            for ( row = -1; row <= 1; row++ )
+            {
+                sy = y + row;
+                step = sy * width;
+
+                if ( sy >= 0 && sy < height )
+                {
+                    for ( col = -1; col <= 1; col++ )
+                    {
+                        sx = x + col;
+
+                        if ( sx >= 0 && sx < width )
+                        {
+                            sum += data[( sx + step ) << 2]; 
+                            total++;
+                        }
+                    }
+                }
+            }
+
+            if ( total )
+            {
+                sum /= total;
+            }
+
+            if ( sum > edge_detect_value )
+            {
+                points.push( [ x, y ]);
+                //points.push( { x: x, y: y } );
+            }
+        }
+    }
+    console.log(points);
+    return points;
+}
+
+Triangulate.getRandomVertices = function( points, rate, max_num, accuracy)
+{
+    //max num is the number of vertices
+ 
+    var width = Triangulate.image.width;
+    var height = Triangulate.image.height;
+
+    var j;
+    var result = [ ];
+    var i = 0;
+    var i_len = points.length;
+    var t_len = i_len;
+    var limit = Math.round( i_len * rate );
+
+    if ( limit > max_num )
+    {
+        limit = max_num;
+    }
+
+    while ( i < limit && i < i_len )
+    {
+        j = t_len * Math.random() | 0;
+        result.push( [ points[j][0], points[j][1] ]);
+        //result.push( [points[j].x, points[j].y] );
+        //result.push( { x: points[j].x, y: points[j].y } );
+
+        // this seems to be extremely time
+        // intensive.
+        // points.splice( j, 1 );
+
+        t_len--;
+        i++;
+    }
+
+    var x, y;
+    // gf: add more points along the edges so we always use the full canvas,
+    for ( x = 0; x < width; x += (100 - accuracy) )
+    {
+        result.push( [ ~~x, 0 ] );
+        result.push( [ ~~x, height ] );
+        //result.push( { x: ~~x, y: 0 } );
+        //result.push( { x: ~~x, y: height } );
+    }
+
+    for ( y = 0; y < height; y += (100 - accuracy) )
+    {
+        result.push( [ 0, ~~y ] );
+        result.push( [ width, ~~y ]);
+        //result.push( { x: 0, y: ~~y } );
+        //result.push( { x: width, y: ~~y } );
+    }
+
+    result.push( [0, height] );
+    result.push( [width, height] );
+    //result.push( { x: 0, y: height } );
+    //result.push( { x: width, y: height } );
+
+    return result;
+}
 //TODO what is the word for this?? mask??
 Triangulate.mask = function( x , isWidth ) {
     if ( x < 0 ) return 0;
@@ -329,51 +442,11 @@ Triangulate.resetThreshold = function ( accuracy ){
     Triangulate.triHeight = Math.ceil(Triangulate.image.height / accuracy);
 }
 
-Triangulate.getVertices = function (accuracy, sensitivity, rand){
-    if (accuracy != Triangulate.accuracy){
-        Triangulate.resetThreshold( accuracy );
-        Triangulate.accuracy = accuracy;
+Triangulate.getVertices = function (accuracy, points, rand, sensitivity){
+    var n = Math.floor(points * .0001 * Triangulate.image.width * Triangulate.image.height);
+    var nodePoints = Triangulate.getEdgePoints( accuracy, sensitivity);
+    var nodeArray = Triangulate.getRandomVertices(nodePoints, .0505, n, sensitivity);
 
-        //reset if need to recalculate unifoirm points
-        Triangulate.getUniformPoints(); 
-    }
-    if (sensitivity != Triangulate.sensitivity){
-        Triangulate.sensitivity = sensitivity;
-    }
-    if (rand != Triangulate.rand){
-        Triangulate.rand = rand;
-    }
-
-    console.log("Get vertices called with " + accuracy + ", " + sensitivity + ", " + rand);
-
-    var nodeArray = Triangulate.uniformPoints.splice();
-    //get the average standard deviations of each block
-    var stdDevResult = Triangulate.getTriStdDevs(sensitivity);
-
-    var stdDevs = stdDevResult[0];
-    var sumStdDev = stdDevResult[1];
-
-    //add the standard edge-detect points
-    var standardPoints = 1000;
-    for (var i = 0; i < Triangulate.baseTriangles.length; i++){
-        for (var j = 0; j < Triangulate.baseTriangles[i].length; j++){
-            var n = Math.round(( stdDevs[i][j] / sumStdDev ) * standardPoints);
-            var triNodes = Triangulate.getTriPoints(n, i, j);         
-
-            nodeArray.push.apply(nodeArray, triNodes);
-        }
-    }
-    //add randomness
-    var nRand = Math.floor(rand * nodeArray.length);
-    var randNodes = [];
-    for (var i = 0; i < nRand; i++){
-        var curNode = [];
-        curNode.push(Math.floor(Math.random() * Triangulate.image.width));
-        curNode.push(Math.floor(Math.random() * Triangulate.image.height));
-
-        randNodes.push(curNode);
-    }
-    nodeArray.push.apply(nodeArray, randNodes);
     return nodeArray;
 }
 

@@ -1,6 +1,144 @@
 /**
  * Filter
  */
+function getEdgePoints( image_data, sensitivity, accuracy )
+{
+    var multiplier = parseInt( ( accuracy || 0.1 ) * 10, 10 ) || 1;
+    console.log(multiplier);
+    var edge_detect_value = sensitivity;
+    var width  = image_data.width;
+    var height = image_data.height;
+    console.log(data);
+    var data = image_data;
+    var points = [ ];
+    var x, y, row, col, sx, sy, step, sum, total;
+
+    for ( y = 0; y < height; y += multiplier )
+    {
+        for ( x = 0; x < width; x += multiplier )
+        {
+            sum = total = 0;
+
+            for ( row = -1; row <= 1; row++ )
+            {
+                sy = y + row;
+                step = sy * width;
+
+                if ( sy >= 0 && sy < height )
+                {
+                    for ( col = -1; col <= 1; col++ )
+                    {
+                        sx = x + col;
+
+                        if ( sx >= 0 && sx < width )
+                        {
+                            sum += data[( sx + step ) << 2]; 
+                            total++;
+                        }
+                    }
+                }
+            }
+
+            if ( total )
+            {
+                sum /= total;
+            }
+
+            if ( sum > edge_detect_value )
+            {
+                curPoint = [];
+                curPoint.push(x);
+                curPoint.push(y);
+                points.push(curPoint);
+            }
+        }
+    }
+
+    return points;
+}
+
+function getRandomVertices( points, rate, max_num, accuracy, width, height )
+{
+    console.log(points);
+    console.log(rate);
+    console.log(max_num);
+    console.log(accuracy);
+    console.log(width);
+    console.log(height);
+    var j;
+    var result = [ ];
+    var i = 0;
+    var i_len = points.length;
+    var t_len = i_len;
+    var limit = Math.round( i_len * rate );
+
+    points = points.slice();
+
+    if ( limit > max_num )
+    {
+        limit = max_num;
+    }
+
+    while ( i < limit && i < i_len )
+    {
+        j = t_len * Math.random() | 0;
+        var curPoint = [];
+        curPoint.push(points[j][0]);
+        curPoint.push(points[j][1]);
+        result.push(curPoint);
+
+        // this seems to be extremely time
+        // intensive.
+        // points.splice( j, 1 );
+
+        t_len--;
+        i++;
+    }
+
+    var x, y;
+
+    // gf: add more points along the edges so we always use the full canvas,
+    for ( x = 0; x < width; x += (100 - accuracy) )
+    {
+        var curPoint = [];
+        curPoint.push( ~~x);
+        curPoint.push(0);
+        result.push(curPoint);
+
+        curPoint = [];
+        curPoint.push(~~x);
+        curPoint.push(height);
+        result.push(curPoint);
+
+    }
+
+    for ( y = 0; y < height; y += (100 - accuracy) )
+    {
+        var curPoint = [];
+        curPoint.push(0);
+        curPoint.push(~~y);
+        result.push(curPoint);
+
+        curPoint = [];
+        curPoint.push(width);
+        curPoint.push(~~y);
+        result.push(curPoint);
+    }
+
+    var curPoint = [];
+    curPoint.push(0);
+    curPoint.push(height);
+    result.push(curPoint);
+
+    curPoint = [];
+    curPoint.push(width);
+    curPoint.push(height);
+    result.push(curPoint);
+
+
+    return result;
+}
+
 var Filter = {
 
     /**

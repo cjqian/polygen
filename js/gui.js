@@ -1,6 +1,5 @@
 var ImageEditor = function() {
     this.imageURL='city.jpg';
-    this.nRand = .01;
 
     //boolean values
     this.showTriangles = true;
@@ -14,8 +13,10 @@ var ImageEditor = function() {
     this.saveButton=false;
 
     //ways to modify
-    this.nAccuracy = 10;
-    this.nSensitivity = 5;
+    this.nAccuracy = 50;
+    this.nPoints = 10;
+    this.nRand = .01;
+    this.nSensitivity = .55;
 };
 
 window.onload = function() {
@@ -26,29 +27,34 @@ window.onload = function() {
         Main.createImage(newName);
     });
 
+    gui.add(ie, 'nAccuracy', 1, 100).step(1).onFinishChange(function(nAccuracy){
+        Voronoi.clearDots();
+
+        Main.updateImage(nAccuracy, ie.nSensitivity, ie.nRand);
+    });
+
+
+    gui.add(ie, 'nPoints', 5, 30).step(1).onFinishChange(function(nPoints){
+        Voronoi.clearDots();
+
+        Main.updateImage(ie.nAccuracy, nPoints, ie.nRand, ie.nSensitivity);
+    });
+
+
     gui.add(ie, 'nRand', 0, 1).onFinishChange(function(nRand){
         Voronoi.clearDots();
 
         Main.updateImage(ie.nAccuracy, ie.nSensitivity, nRand); 
     });
 
-    var minParam = Math.min(Main.image.width, Main.image.height);
-    var nSensitivityThreshold = Math.floor(minParam / ie.nAccuracy);
-    gui.add(ie, 'nSensitivity', 1, nSensitivityThreshold).step(1).onFinishChange(function(nSensitivity){
+
+    gui.add(ie, 'nSensitivity', 0, 1).step(.01).onFinishChange(function(nSensitivity){
         console.log("changed to " + ie.nSensitivity);
         Voronoi.clearDots();
 
         Main.updateImage(ie.nAccuracy, nSensitivity, ie.nRand);
     });
 
-
-    gui.add(ie, 'nAccuracy', 2, 100).step(1).onFinishChange(function(nAccuracy){
-        Voronoi.clearDots();
-
-        Main.updateImage(nAccuracy, ie.nSensitivity, ie.nRand);
-    });
-
-   
     //show, edit
     gui.add(ie, 'showTriangles').onChange(function(changeValue){
         Voronoi.toggleShowTriangles(changeValue);

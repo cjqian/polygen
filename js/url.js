@@ -44,14 +44,20 @@ Url.handleUrl = function(path){
      }
 
     if (typeof urlObject.nAccuracy == "undefined"){
-        urlObject.nAccuracy = 8;
+        urlObject.nAccuracy = 50;
      }
-     if (typeof urlObject.nSensitivity == "undefined"){
-        urlObject.nSensitivity = 8;
+if (typeof urlObject.nPoints == "undefined"){
+        urlObject.nRand = 10;
      }
+
 
      if (typeof urlObject.nRand == "undefined"){
         urlObject.nRand = .01;
+     }
+
+
+     if (typeof urlObject.nSensitivity == "undefined"){
+        urlObject.nSensitivity = .5;
      }
 
     console.log(urlObject.nSensitivity);
