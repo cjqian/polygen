@@ -42,9 +42,10 @@ Main.setupImage = function(nAccuracy, nSensitivity, nRand) {
 }
 
 Main.updateImage = function(nAccuracy, nPoints, nRand, nSensitivity){
-    ThreeD.pointArray = Triangulate.getVertices(nAccuracy, nPoints,nRand,  nSensitivity);
-    Voronoi.updateDots(ThreeD.pointArray);
-
+    var vertices = Triangulate.getVertices(nAccuracy, nPoints,nRand,  nSensitivity);
+    var vectorVertices = Voronoi.updateDots(vertices);
+    console.log(vectorVertices);
+    ThreeD.polygonArray = vectorVertices.slice()[0];
     ThreeD.update();
 }
 

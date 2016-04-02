@@ -1,6 +1,6 @@
 var ThreeD = ThreeD || {};
-ThreeD.pointArray;
-
+ThreeD.polygonArray;
+ThreeD.mesh;
 var three = THREE;
 
 var scene = new three.Scene();
@@ -12,6 +12,88 @@ renderer.setSize(window.innerWidth, window.innerHeight);
 document.body.appendChild(renderer.domElement);
 
 var geometry = new three.BoxGeometry(1, 1, 1);
+
+/* My functions */
+//makes an array of 3D vectors
+ThreeD.geometry;
+
+ThreeD.getZ = function( point ){
+    return Math.floor(Math.random() * 1000);
+}
+ThreeD.setGeometry = function(){
+
+var geom = new THREE.Geometry(); 
+var v1 = new THREE.Vector3(0,0,0);
+var v2 = new THREE.Vector3(0,500,0);
+var v3 = new THREE.Vector3(0,500,500);
+
+    //for each triangle
+    for (var i = 0; i < ThreeD.polygonArray.length; i++){
+        var curTriangle = ThreeD.polygonArray[i];
+
+        //for each point
+        for (var j = 0; j < 3; j++){
+           var curPoint = curTriangle.points[j];
+
+           var curVector = new THREE.Vector3(curPoint.x, curPoint.y, ThreeD.getZ(curPoint));
+           geom.vertices.push(curVector);    
+        }
+
+        geom.faces.push(new THREE.Face3(i * 3, i * 3 + 1, i * 3 + 2));
+    }
+/* 
+geom.vertices.push(v1);
+geom.vertices.push(v2);
+geom.vertices.push(v3);
+*/
+/*
+geom.faces.push( new THREE.Face3( 0, 1, 2 ) );
+*/
+geom.computeFaceNormals();
+
+var object = new THREE.Mesh( geom, new THREE.MeshNormalMaterial() );
+
+object.position.z = -100;//move a bit back - size of 500 is a bit big
+
+object.rotation.y = -Math.PI * .5;//triangle is pointing in depth, rotate it -90 degrees on Y
+
+scene.add(object);
+/*
+    scene.remove(ThreeD.geometry);
+    ThreeD.geometry = new THREE.Geometry();
+
+    //for each triangle
+    for (var i = 0; i < 10; i++){
+    //for (var i = 0; i < ThreeD.polygonArray.length; i++){
+        var curTriangle = ThreeD.polygonArray[i];
+
+        //for each point
+        for (var j = 0; j < 2; j++){
+           var curPoint = curTriangle.points[j];
+
+           var curVector = new THREE.Vector3(curPoint.x, curPoint.y, ThreeD.getZ(curPoint));
+           ThreeD.geometry.dynamic = true;
+           ThreeD.geometry.vertices.push(curVector);    
+    ThreeD.geometry.verticesNeedUpdate = true;
+        }
+
+           ThreeD.geometry.dynamic = true;
+        ThreeD.geometry.faces.push(new THREE.Face3(i * 3, i * 3 + 1, i * 3 + 2));
+
+    ThreeD.geometry.verticesNeedUpdate = true;
+        ThreeD.geometry.computeFaceNormals();
+    }
+  
+    console.log(ThreeD.geometry);
+    ThreeD.mesh = new THREE.Mesh(ThreeD.geometry, new THREE.MeshNormalMaterial() );
+    console.log(ThreeD.mesh);
+    ThreeD.mesh.position.z = -1000;
+    scene.add(ThreeD.mesh);
+*/
+}
+
+
+
 //var material = new three.MeshNormalMaterial();
 /* * /
    var material = new three.MeshBasicMaterial({
@@ -49,7 +131,7 @@ cube.rotation.y = Math.PI/4;
 scene.add(cube);
 
 
-camera.position.z = 5;
+camera.position.z = 1000;
 
 /* */
 var isDragging = false;
@@ -126,13 +208,11 @@ function update(dt, t) {
 
 function render() {
     renderer.render(scene, camera);
-
-
     requestAnimFrame(render);
 }
 
 ThreeD.update = function(){
-    console.log(ThreeD.pointArray);
+    ThreeD.setGeometry();
     render();
     update(0, totalGameTime);
 }

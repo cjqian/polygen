@@ -240,7 +240,8 @@ Voronoi.updateDots = function(coords) {
 
     dots.exit().remove();
 
-    Voronoi.updateVoronoi(data);
+    var polygons = Voronoi.updateVoronoi(data);
+    return polygons;
 }
 
 Voronoi.updateVoronoi = function(data) {
@@ -284,7 +285,6 @@ Voronoi.updateVoronoi = function(data) {
     myTriangles = triangles
         .selectAll(".triangles")
         .data(myVoronoi.triangles(data));
-
     myTriangles
         .attr("points", function(d){
             centerCircles.push(findCenters(d)); return d.join(" ")
@@ -304,7 +304,10 @@ Voronoi.updateVoronoi = function(data) {
         })
     .classed("hidden", !show.triangles);
 
+    var vectorVertices = myTriangles;
     myTriangles.exit().remove();
+    console.log(vectorVertices);
+    return vectorVertices;
 }
 
 // circumcenter equation from wikipedia: http://en.wikipedia.org/wiki/Circumscribed_circle
