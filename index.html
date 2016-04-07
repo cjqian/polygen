@@ -1,40 +1,30 @@
-<doctype html>
-<html lang="en">
+<html>
 <head>
-<meta charset="utf-8">
-
-
-<script type="text/javascript" src="lib/jquery.js"></script>
-
-<script type="text/javascript" src="lib/three.js"></script>
-<script type="text/javascript" src="js/3d.js"></script>
-<script type="text/javascript" src="lib/dat.gui.min.js"></script>
-<script type="text/javascript" src="lib/image.js"></script>
-<script type="text/javascript" src="js/gui.js"></script>
-<link rel="stylesheet" href="css/voronoi.css">
-
-<script src="lib/d3.js" charset="utf-8"></script>
-
+<title>Trackball Controls in Three.js</title>
 </head>
-
 <body>
+
+
+<div id="container"></div>
+
+<!-- make sure this is just below the closing </body> tag -->
+<!-- for some reason the latest three.js doesn't work, so we use the one from the example file-->
+<script type="text/javascript" src="lib/jquery.js"></script>
+<script src="lib/three.js"></script>
+<script src="lib/delaunay.js"></script>
+<script src="lib/image.js"></script>
+
+<script type="text/javascript" src="js/Detector.js"></script>
+<script src="js/controls/TrackballControls.js"></script>
+
 <canvas id="canvas"></canvas>
-<!-- call JS files -->
-<script src="js/filter.js"></script>
-<script src="js/triangulate.js"></script>
+<script src="js/triangulate.js"></script> 
 
-<script src="js/main.js"></script>
-<script type="text/javascript" src="js/gui.js"></script>
-<script src="js/url.js"><script>
-
-<script> console.log("url loaded");</script>
-<input id="file" type="file" style="visibility:hidden"/>
-
+<script src="js/scene.js"></script> 
 <script>
-    console.log(window.location.search);
-    Url.handleUrl(window.location.search.toString());
+    Triangulate.initImage('city.jpg', 50, 2000, .05, .5);
 </script>
 
-<script src="js/voronoi.js"></script>
-</body>
-</html>
+
+    </body>
+    </html>    

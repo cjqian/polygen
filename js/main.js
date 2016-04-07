@@ -46,7 +46,7 @@ Main.updateImage = function(nAccuracy, nPoints, nRand, nSensitivity){
     var vectorVertices = Voronoi.updateDots(vertices);
     console.log(vectorVertices);
     ThreeD.polygonArray = vectorVertices.slice()[0];
-    ThreeD.update();
+    //ThreeD.update();
 }
 
 Main.saveImage = function(saveName){
