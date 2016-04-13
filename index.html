@@ -10,19 +10,26 @@
 <!-- make sure this is just below the closing </body> tag -->
 <!-- for some reason the latest three.js doesn't work, so we use the one from the example file-->
 <script type="text/javascript" src="lib/jquery.js"></script>
+
+<script src="lib/d3.js"></script>
 <script src="lib/three.js"></script>
+<script src="lib/superfast-blur.0.5.js"></script>
+<script src="lib/PointerLockControls.js"></script>
 <script src="lib/delaunay.js"></script>
 <script src="lib/image.js"></script>
-
+<script src="lib/dat.gui.min.js"></script>
 <script type="text/javascript" src="js/Detector.js"></script>
 <script src="js/controls/TrackballControls.js"></script>
 
 <canvas id="canvas"></canvas>
 <script src="js/triangulate.js"></script> 
-
-<script src="js/scene.js"></script> 
+<script src="js/twoscene.js"></script>
+<script src="js/threescene.js"></script> 
+<script src="js/triangulate.js"></script>
+<script src="js/gui.js"></script>
+<script src="js/url.js"></script>
 <script>
-    Triangulate.initImage('city.jpg', 50, 2000, .05, .5);
+    Url.handleUrl(window.location.search.toString());
 </script>
 
 

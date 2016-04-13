@@ -1,6 +1,6 @@
 var Url = Url || {};
 
-Url.validParams = ["imagePath", "nVertices", "nRand"];
+Url.validParams = ["imagePath", "nAccuracy", "nBlur", "nPoints", "nRand", "nSensitivity"];
 
 Url.getObject = function(path){
     urlObject = {};
@@ -38,30 +38,34 @@ Url.handleUrl = function(path){
      *
      */
 
-     //defaults
-     if (typeof urlObject.imagePath == "undefined"){
+    //defaults
+    if (typeof urlObject.imagePath == "undefined"){
         urlObject.imagePath = "city.jpg";
-     }
+    }
 
     if (typeof urlObject.nAccuracy == "undefined"){
         urlObject.nAccuracy = 50;
-     }
-if (typeof urlObject.nPoints == "undefined"){
-        urlObject.nRand = 10;
-     }
+    }
+
+    if (typeof urlObject.nBlur == "undefined"){
+        urlObject.nBlur = 15;
+    }
+    
+    if (typeof urlObject.nPoints == "undefined"){
+        urlObject.nPoints = 2000;;
+    }
 
 
-     if (typeof urlObject.nRand == "undefined"){
+    if (typeof urlObject.nRand == "undefined"){
         urlObject.nRand = .01;
-     }
+    }
 
 
-     if (typeof urlObject.nSensitivity == "undefined"){
+    if (typeof urlObject.nSensitivity == "undefined"){
         urlObject.nSensitivity = .5;
-     }
+    }
 
-    console.log(urlObject.nSensitivity);
-    Main.createImage(urlObject.imagePath, urlObject.nAccuracy, urlObject.nSensitivity, urlObject.nRand);
+    Triangulate.initImage(urlObject.imagePath, urlObject.nAccuracy, urlObject.nBlur, urlObject.nPoints, urlObject.nRand, urlObject.nSensitivity);
 }
 
 

@@ -271,7 +271,7 @@ Triangulate.wrapAroundCylinder = function(vertices){
 }
 
 //Triangulate.updateVertices = function(n){
-Triangulate.updateVertices = function (accuracy, points, rand, sensitivity){
+Triangulate.updateVertices = function (accuracy, blur, points, rand, sensitivity){
     //make sure we have a fresh copy of the processed data
     Triangulate.processedData = Triangulate.image.data.slice();
 
@@ -305,25 +305,10 @@ Triangulate.updateVertices = function (accuracy, points, rand, sensitivity){
 
     //now we wrap them
     Triangulate.threeVertices = Triangulate.twoVertices.slice();
-    //Triangulate.vertexHeights = new Array(Triangulate.twoVertices.length);  
-    //Triangulate.threeVertices = Triangulate.wrapAroundCylinder(Triangulate.twoVertices);
-
-    /*
-       var vertices = new Array(n),
-       i, x, y;
-
-       for(i = vertices.length; i--; ) {
-       x = Math.random() * 1000;
-       y = Math.random() * 1000;
-       vertices[i] = [x, y];
-       }
-
-       return vertices;
-       */
 }
 
 
-Triangulate.initImage = function(imagePath, nAccuracy, nPoints, nRand, nSensitivity){
+Triangulate.initImage = function(imagePath, nAccuracy, nBlur, nPoints, nRand, nSensitivity){
     var image = new Image();    
     image.src = './img/' + imagePath;
 
@@ -347,11 +332,13 @@ Triangulate.initImage = function(imagePath, nAccuracy, nPoints, nRand, nSensitiv
         Triangulate.processedData = imageData;
 
         //get triangles and vertices
-        Triangulate.updateVertices(nAccuracy, nPoints, nRand, nSensitivity);
+        Triangulate.updateVertices(nAccuracy, nBlur, nPoints, nRand, nSensitivity);
 
         //do the scene load
-        init();
-        animate();
+        //TwoScene.initCanvas(Triangulate.image);
+        ThreeScene.init();
+        //TwoScene.updateDots(Triangulate.twoVertices);
+        ThreeScene.animate();
     };
 }
 
