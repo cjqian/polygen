@@ -1,15 +1,5 @@
 var TwoScene = TwoScene || {};
 
-/*
-
-   to do: 
-
-   Add css for p, shapes
-   Add mouseover to triangle/circle to show only triangle & circle & show circle's center?
-   Add mouseover to polygons to highlight that polygon & its dot?
-   */
-
-
 var width, height, endOfLastDrag, svg;
 var myTwoScene;
 var voronoiG, triangles;
@@ -19,8 +9,7 @@ TwoScene.image;
 var dotsAttr, drag;
 var addMode = true;
 
-TwoScene.initCanvas = function(image){
-console.log(image);
+TwoScene.init = function(image){
     TwoScene.image = image;
     width = image.width, height = image.height;
     endOfLastDrag = 0;
@@ -131,6 +120,7 @@ TwoScene.removeDot = function(coord) {
 
 
 TwoScene.updateDot = function(coord) {
+    console.log("UPDATE CALLED ");
     if(coord){
         var data = [coord];
     } else {
@@ -174,7 +164,9 @@ TwoScene.toFlatArray = function(coords){
 
 TwoScene.updateDots = function(coords) {
     if(coords){
-        var data = TwoScene.toFlatArray(coords);
+        var data = coords;
+        //var data = TwoScene.toFlatArray(coords);
+        console.log(data);
     } else {
         var data = []
     }
@@ -253,8 +245,8 @@ TwoScene.updateTwoScene = function(data) {
             var color = Triangulate.getColorOfFace(TwoScene.toObjPoint(d[0]),
                 TwoScene.toObjPoint(d[1]), 
                 TwoScene.toObjPoint(d[2]));
-            console.log(color);
-            return color;
+            colorString = color.toHex();
+            return colorString;
         })
     .classed("hidden", !show.triangles);
 

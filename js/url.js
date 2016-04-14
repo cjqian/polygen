@@ -1,6 +1,8 @@
 var Url = Url || {};
 
-Url.validParams = ["imagePath", "nAccuracy", "nBlur", "nPoints", "nRand", "nSensitivity"];
+Url.validParams = ["imagePath", "accuracy", "blur", "points", "rand", "sensitivity", "meshType"];
+
+Url.object;
 
 Url.getObject = function(path){
     urlObject = {};
@@ -22,7 +24,6 @@ Url.getObject = function(path){
             urlObject[curParam[0]] = curParam[1];
         }
     }
-
     return urlObject;
 }
 
@@ -34,38 +35,48 @@ Url.handleUrl = function(path){
     /* 
      * imagePath: "city.jpg"
      * nVertices: 600
-     * nRand: 200
+     * rand: 200
      *
      */
 
     //defaults
+if (typeof urlObject.mountainHeight == "undefined"){
+    urlObject.mountainHeight = 50;
+    }
     if (typeof urlObject.imagePath == "undefined"){
         urlObject.imagePath = "city.jpg";
     }
 
-    if (typeof urlObject.nAccuracy == "undefined"){
-        urlObject.nAccuracy = 50;
+    if (typeof urlObject.accuracy == "undefined"){
+        urlObject.accuracy = 50;
     }
 
-    if (typeof urlObject.nBlur == "undefined"){
-        urlObject.nBlur = 15;
+    if (typeof urlObject.blur == "undefined"){
+        urlObject.blur = 15;
     }
     
-    if (typeof urlObject.nPoints == "undefined"){
-        urlObject.nPoints = 2000;;
+    if (typeof urlObject.points == "undefined"){
+        urlObject.points = 2000;;
     }
 
 
-    if (typeof urlObject.nRand == "undefined"){
-        urlObject.nRand = .01;
+    if (typeof urlObject.rand == "undefined"){
+        urlObject.rand = .01;
     }
 
 
-    if (typeof urlObject.nSensitivity == "undefined"){
-        urlObject.nSensitivity = .5;
+    if (typeof urlObject.meshType == "undefined"){
+        urlObject.meshType = "plane";
     }
 
-    Triangulate.initImage(urlObject.imagePath, urlObject.nAccuracy, urlObject.nBlur, urlObject.nPoints, urlObject.nRand, urlObject.nSensitivity);
+
+
+    if (typeof urlObject.sensitivity == "undefined"){
+        urlObject.sensitivity = .5;
+    }
+    Url.object = urlObject;
+
+    Triangulate.initImage(urlObject);
 }
 
 

@@ -16,33 +16,33 @@ ThreeScene.init = function() {
     container = document.getElementById('container');
     container.appendChild(renderer.domElement);
 
-    camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, .1,  10000 );
-    camera.position.set(0, 0, -1000);
+    camera = new THREE.PerspectiveCamera(90, window.innerWidth / window.innerHeight, 1,  10000 );
+    camera.up.set(0, -1, 0);
+    camera.position.set(0, 0, 1000);
+    //camera.rotation.y = 90 * Math.PI / 180;
 
-    cameraControls = new THREE.TrackballControls(camera, renderer.domElement);
+    cameraControls = new THREE.TrackballControls(camera);
+    //cameraControls = new THREE.TrackballControls(camera, renderer.domElement);
     cameraControls.target.set(0, 0, 0);
 
     scene = new THREE.Scene();
-
+    camera.lookAt(scene.position);
     // lights
     light = new THREE.DirectionalLight( 0xffffff );
     light.position.set( 1, 1, 1 );
     scene.add( light );
 
-    light = new THREE.DirectionalLight( 0x002288 );
-    light.position.set( -1, -1, -1 );
-    scene.add( light );
+    //light = new THREE.DirectionalLight( 0x002288 );
+    //light.position.set( -1, -1, -1 );
+    //scene.add( light );
 
     light = new THREE.AmbientLight( 0x222222 );
     scene.add( light );
 
-    material = new THREE.MeshBasicMaterial({
-        wireframe: true,
-             color: 'black'
-    });
-
-    //now, we load the thing
-    ThreeScene.makeMesh();
+    //material = new THREE.MeshBasicMaterial({
+        //wireframe: true,
+             //color: 'black'
+    //});
 
     window.addEventListener( 'resize', onWindowResize, false );
 }
@@ -59,10 +59,8 @@ ThreeScene.animate = function() {
 ThreeScene.makeGeometry = function(){
     var geom = new THREE.Geometry();
     var vertices = Triangulate.threeVertices;
+    console.log(vertices.length);
     var triangles = Triangulate.triangles;
-
-    console.log(vertices);
-    console.log(triangles);
 
     var heights = Triangulate.vertexHeights;
     var idx = 0;
@@ -86,11 +84,8 @@ ThreeScene.makeGeometry = function(){
     }
 
     for ( var i = 0; i < geom.faces.length; i ++ ) {
-        //console.log(vertices[geom.faces[i]].a);
-        var vertex = geom.vertices[geom.faces[i].a];
-        var color = Triangulate.getColorOfFace(geom.vertices[geom.faces[i].a], geom.vertices[geom.faces[i].b], geom.vertices[geom.faces[i].c]);
-        var string = '0x' + color.toHex().substring(1, color.toHex().length);
-        geom.faces[ i ].color.setHex( string);
+        var color = Triangulate.faceColors[i];
+        geom.faces[i].color.setHex(color);
     }
 
     return geom;
@@ -108,11 +103,11 @@ ThreeScene.makeMesh = function(){
 
     ThreeScene.mesh = new THREE.Mesh(geom, material);
     scene.add(ThreeScene.mesh);
+    ThreeScene.mesh.position.set(-1000, -800, 0);
 }
 
 //TODO: fix resizing
 function onWindowResize() {
-
     camera.aspect = window.innerWidth / window.innerHeight;
     camera.updateProjectionMatrix();
 
@@ -122,10 +117,8 @@ function onWindowResize() {
 
 }
 
-
-
-function update(nAccuracy, nBlur, nPoints, nRand, nSensitivity){
-    Triangulate.updateVertices(nAccuracy, nBlur, nPoints, nRand, nSensitivity);
+ThreeScene.update =function(paramObject){
+    Triangulate.updateVertices(paramObject);
     scene.remove(ThreeScene.mesh);
     ThreeScene.makeMesh();
     ThreeScene.animate();

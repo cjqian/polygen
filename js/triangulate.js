@@ -3,10 +3,14 @@ var Triangulate = Triangulate || {};
 Triangulate.image;
 Triangulate.processedData;
 
+Triangulate.meshType;
+
 Triangulate.twoVertices;
 Triangulate.threeVertices;
 Triangulate.vertexHeights;
+
 Triangulate.triangles;
+Triangulate.faceColors;
 
 Triangulate.getEdgeMatrix = function( size )
 {
@@ -270,53 +274,138 @@ Triangulate.wrapAroundCylinder = function(vertices){
     return cylinderVertices;
 }
 
+//using hammer aitoff map projection
+Triangulate.wrapAroundSphere = function(vertices){
+    var sphereVertices = [];
+    for (var i = 0; i < vertices.length; i++){
+        var latitude = vertices[i][0];
+        var longitude = vertices[i][1];
+
+        var zsq = 1 + Math.cos(latitude) * Math.cos(longitude / 2);
+        var zunround = Math.sqrt(zsq);
+
+        var xunround = Math.cos(latitude) * Math.sin(longitude / 2) / zunround;
+        var yunround = Math.sin(latitude) / zunround;
+
+        var x = Math.round(xunround);
+        var y = Math.round(yunround);
+        var z = Math.round(zunround);
+
+        console.log(x);
+        console.log(y);
+
+        sphereVertices.push([x, y]);
+        Triangulate.vertexHeights[i] = z;
+    }
+
+   return sphereVertices;
+}
+
+
+//Now that triangulate.triangles is set, we use those values to 
+//get the color of each face. return in an array of '0xaaaaaa'
+Triangulate.getFaceColors = function(){
+    faceColors = [];
+
+    var triangles = Triangulate.triangles;
+    var vertices = Triangulate.twoVertices;
+
+    for (var i = triangles.length; i; ){
+        i--;
+        var v1 = vertices[triangles[i]];
+
+        i--;
+        var v2 = vertices[triangles[i]];
+
+        i--;
+        var v3 = vertices[triangles[i]];
+
+        var centerX = Math.round((v1[0] + v2[0] + v3[0]) * .3333);
+        var centerY = Math.round((v1[1] + v2[1] + v3[1]) * .3333);
+
+        var color = Triangulate.image.getPixel(centerY, centerX);
+        var colorString = '0x' + color.toHex().substring(1, color.toHex().length);
+
+        faceColors.push(colorString);
+    }
+     
+    return faceColors;
+}
 //Triangulate.updateVertices = function(n){
-Triangulate.updateVertices = function (accuracy, blur, points, rand, sensitivity){
+Triangulate.updateVertices = function( paramObject ){
+    //get values
+    var accuracy = paramObject.accuracy;
+    var blur = paramObject.blur;
+    var points = paramObject.points;
+    var rand = paramObject.rand;
+    var sensitivity = paramObject.sensitivity;
+
     //make sure we have a fresh copy of the processed data
     Triangulate.processedData = Triangulate.image.data.slice();
 
     //first, we preprocess: blur, greyscale, then edge detect
-    //blur uses lib/blur
     Triangulate.processedData = boxBlurCanvas(Triangulate.processedData, blur, false);
     Triangulate.processedData = Triangulate.greyscale(Triangulate.processedData);
     Triangulate.processedData = Triangulate.detectEdges(Triangulate.processedData, accuracy, 5);
 
-    console.log("processed");
-    console.log(Triangulate.processedData);
-
-    
-    console.log("ORIAINL");
-    console.log(Triangulate.image.data);
     var n = Math.floor(points * .0001 * Triangulate.image.width * Triangulate.image.height);
-    console.log(n + " points" );
     var nodePoints = Triangulate.getEdgePoints( accuracy, sensitivity);
     var nodeArray = Triangulate.getRandomVertices(nodePoints, .0505, n, sensitivity);
 
-    //also, set up vertex heights
-    Triangulate.vertexHeights = new Array(points);
-    for (var i = 0; i < points; i++){
-        Triangulate.vertexHeights.push(0);
-        //Triangulate.vertexHeights.push((Math.random() - .5) * 100);
-    }
     //2d triangles
+    Triangulate.twoVertices = [];
     Triangulate.twoVertices = nodeArray.slice();
+
+    Triangulate.triangles = [];
     Triangulate.triangles = Delaunay.triangulate( Triangulate.twoVertices  ).slice();
+    Triangulate.faceColors = Triangulate.getFaceColors();
 
+    Triangulate.threeVertices = [];
+    Triangulate.vertexHeights = new Array(points);
+    //handle the object types
+    if (paramObject.meshType == "plane"){
+        for (var i = 0; i < nodeArray.length; i++){
+            Triangulate.vertexHeights.push(0);
+        }
 
-    //now we wrap them
-    Triangulate.threeVertices = Triangulate.twoVertices.slice();
+        Triangulate.threeVertices = Triangulate.twoVertices.slice();
+    }
+
+    else if (paramObject.meshType == "mountain"){
+        for (var i = 0; i < nodeArray.length; i++){
+            Triangulate.vertexHeights.push((Math.random() - .5) * paramObject.mountainHeight);
+        }
+
+        Triangulate.threeVertices = Triangulate.twoVertices.slice();
+    } 
+
+    else if (paramObject.meshType == "cylinder"){
+        Triangulate.threeVertices = Triangulate.wrapAroundCylinder(Triangulate.twoVertices);
+    }
+
+    else if (paramObject.meshType == "mountain_cylinder"){
+        Triangulate.threeVertices = Triangulate.wrapAroundCylinder(Triangulate.twoVertices);
+        //add noise to x values
+        for (var i = 0; i < Triangulate.threeVertices.length; i++){
+            Triangulate.threeVertices[i][0] = Math.round(Triangulate.threeVertices[i][0] + (Math.random() - .5) * paramObject.mountainHeight);
+        }
+    }
+
+    else if (paramObject.meshType == "sphere"){
+        Triangulate.threeVertices = Triangulate.wrapAroundSphere(Triangulate.twoVertices);
+    }
 }
 
 
-Triangulate.initImage = function(imagePath, nAccuracy, nBlur, nPoints, nRand, nSensitivity){
+Triangulate.initImage = function(paramObject){
     var image = new Image();    
-    image.src = './img/' + imagePath;
+    image.src = './img/' + paramObject.imagePath;
 
     var canvas = document.getElementById('canvas');
     var context = canvas.getContext('2d');
 
     var imageElement = document.createElement('img');
-    imageElement.src = './img/' + imagePath;
+    imageElement.src = './img/' + paramObject.imagePath;
 
     imageElement.onload = function(){
         context.clearRect(0, 0, canvas.width, canvas.height);
@@ -331,17 +420,14 @@ Triangulate.initImage = function(imagePath, nAccuracy, nBlur, nPoints, nRand, nS
         //make the greyscale image
         Triangulate.processedData = imageData;
 
-        //get triangles and vertices
-        Triangulate.updateVertices(nAccuracy, nBlur, nPoints, nRand, nSensitivity);
-
-        //do the scene load
-        //TwoScene.initCanvas(Triangulate.image);
-        ThreeScene.init();
+            //do the scene load
+        //TwoScene.init(Triangulate.image);
         //TwoScene.updateDots(Triangulate.twoVertices);
-        ThreeScene.animate();
+
+        ThreeScene.init();
+        ThreeScene.update(paramObject);
     };
 }
-
 
 Triangulate.getColorOfFace = function(vertexA, vertexB, vertexC){
     var centerX = Math.round((vertexA.x + vertexB.x + vertexC.x) * .3333);
