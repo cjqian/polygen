@@ -1,6 +1,6 @@
 var Url = Url || {};
 
-Url.validParams = ["imagePath", "accuracy", "blur", "points", "rand", "sensitivity", "meshType"];
+Url.validParams = ["imagePath", "accuracy", "blur", "points", "rate", "sensitivity", "meshType", "mountainHeight"];
 
 Url.object;
 
@@ -24,6 +24,8 @@ Url.getObject = function(path){
             urlObject[curParam[0]] = curParam[1];
         }
     }
+
+    console.log(urlObject);
     return urlObject;
 }
 
@@ -48,31 +50,27 @@ if (typeof urlObject.mountainHeight == "undefined"){
     }
 
     if (typeof urlObject.accuracy == "undefined"){
-        urlObject.accuracy = 50;
+        urlObject.accuracy = .55;
     }
 
     if (typeof urlObject.blur == "undefined"){
-        urlObject.blur = 15;
+        urlObject.blur = 25;
     }
     
     if (typeof urlObject.points == "undefined"){
-        urlObject.points = 2000;;
+        urlObject.points = 2000;
     }
-
-
-    if (typeof urlObject.rand == "undefined"){
-        urlObject.rand = .01;
-    }
-
 
     if (typeof urlObject.meshType == "undefined"){
         urlObject.meshType = "plane";
     }
 
-
+    if (typeof urlObject.rate == "undefined"){
+        urlObject.rate = .0505;
+    }
 
     if (typeof urlObject.sensitivity == "undefined"){
-        urlObject.sensitivity = .5;
+        urlObject.sensitivity = 50;
     }
     Url.object = urlObject;
 
